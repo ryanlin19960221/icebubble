@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎬 彈幕泡泡 × 滿版動態照片牆互動系統</title>
+    <title>彈幕泡泡 + 滿版動態照片牆互動系統</title>
     <!-- Tailwind CSS 引入 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 圖標引入 -->
@@ -14,6 +15,7 @@
             overflow: hidden;
             user-select: none;
         }
+
         /* 霧面玻璃效果 - 戰術橘微光 */
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
@@ -21,6 +23,7 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(234, 88, 12, 0.2);
         }
+
         /* 針對暗色背景的霧面 (大螢幕重播面板使用) */
         .glass-panel-dark {
             background: rgba(28, 25, 23, 0.85);
@@ -28,6 +31,7 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(234, 88, 12, 0.3);
         }
+
         /* 照片轉場動效 */
         .photo-layer {
             transition: opacity 1.5s ease-in-out, transform 10s ease-out;
@@ -37,13 +41,16 @@
         ::-webkit-scrollbar {
             width: 5px;
         }
+
         ::-webkit-scrollbar-track {
             background: rgba(120, 113, 108, 0.1);
         }
+
         ::-webkit-scrollbar-thumb {
             background: rgba(234, 88, 12, 0.3);
             border-radius: 0px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(234, 88, 12, 0.6);
         }
@@ -60,38 +67,79 @@
             content: '';
             position: absolute;
             top: 0;
-            left: -8px; /* 配合縮小後的氣泡，微調尾巴位置 */
+            left: -8px;
+            /* 配合縮小後的氣泡，微調尾巴位置 */
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 0 8px 10px 0; /* 縮減尾巴三角形尺寸 */
-            border-color: transparent transparent transparent transparent; /* 預設透明，下方會被個別色系覆蓋 */
+            border-width: 0 8px 10px 0;
+            /* 縮減尾巴三角形尺寸 */
+            border-color: transparent transparent transparent transparent;
+            /* 預設透明，下方會被個別色系覆蓋 */
         }
 
         /* 自定義動態色彩氣泡 (馬卡龍色系) & 尾巴三角形邊框色同步 */
-        .bubble-pink { background-color: rgba(254, 219, 224, 0.95); border: 1.5px solid rgba(253, 164, 186, 0.4); color: #85142b; }
-        .bubble-pink::after { border-right-color: rgba(254, 219, 224, 0.95); }
+        .bubble-pink {
+            background-color: rgba(254, 219, 224, 0.95);
+            border: 1.5px solid rgba(253, 164, 186, 0.4);
+            color: #85142b;
+        }
 
-        .bubble-blue { background-color: rgba(219, 242, 254, 0.95); border: 1.5px solid rgba(147, 197, 253, 0.4); color: #1e3a8a; }
-        .bubble-blue::after { border-right-color: rgba(219, 242, 254, 0.95); }
+        .bubble-pink::after {
+            border-right-color: rgba(254, 219, 224, 0.95);
+        }
 
-        .bubble-green { background-color: rgba(220, 252, 231, 0.95); border: 1.5px solid rgba(134, 239, 172, 0.4); color: #14532d; }
-        .bubble-green::after { border-right-color: rgba(220, 252, 231, 0.95); }
+        .bubble-blue {
+            background-color: rgba(219, 242, 254, 0.95);
+            border: 1.5px solid rgba(147, 197, 253, 0.4);
+            color: #1e3a8a;
+        }
 
-        .bubble-yellow { background-color: rgba(254, 249, 195, 0.95); border: 1.5px solid rgba(253, 224, 71, 0.4); color: #713f12; }
-        .bubble-yellow::after { border-right-color: rgba(254, 249, 195, 0.95); }
+        .bubble-blue::after {
+            border-right-color: rgba(219, 242, 254, 0.95);
+        }
 
-        .bubble-purple { background-color: rgba(243, 232, 255, 0.95); border: 1.5px solid rgba(216, 180, 254, 0.4); color: #581c87; }
-        .bubble-purple::after { border-right-color: rgba(243, 232, 255, 0.95); }
+        .bubble-green {
+            background-color: rgba(220, 252, 231, 0.95);
+            border: 1.5px solid rgba(134, 239, 172, 0.4);
+            color: #14532d;
+        }
+
+        .bubble-green::after {
+            border-right-color: rgba(220, 252, 231, 0.95);
+        }
+
+        .bubble-yellow {
+            background-color: rgba(254, 249, 195, 0.95);
+            border: 1.5px solid rgba(253, 224, 71, 0.4);
+            color: #713f12;
+        }
+
+        .bubble-yellow::after {
+            border-right-color: rgba(254, 249, 195, 0.95);
+        }
+
+        .bubble-purple {
+            background-color: rgba(243, 232, 255, 0.95);
+            border: 1.5px solid rgba(216, 180, 254, 0.4);
+            color: #581c87;
+        }
+
+        .bubble-purple::after {
+            border-right-color: rgba(243, 232, 255, 0.95);
+        }
 
         /* ========================================== */
         /* 遠距離投影專用：響應式極致字型自適應設計      */
         /* ========================================== */
         .responsive-name {
-            font-size: clamp(11px, 0.95vw, 18px); /* 💡 稍微縮減暱稱大小 */
+            font-size: clamp(11px, 0.95vw, 18px);
+            /* 💡 稍微縮減暱稱大小 */
         }
+
         .responsive-text {
-            font-size: clamp(13px, 1.35vw, 24px); /* 💡 縮減留言字級，使其精緻不搶戲 */
+            font-size: clamp(13px, 1.35vw, 24px);
+            /* 💡 縮減留言字級，使其精緻不搶戲 */
             line-height: 1.35;
         }
 
@@ -102,88 +150,129 @@
         }
     </style>
 </head>
+
 <body class="bg-[#f5f5f0] text-[#1c1917] font-sans w-screen h-screen">
 
     <!-- ========================================== -->
     <!-- 1. 入口中控導航 (Home Hub)                 -->
     <!-- ========================================== -->
-    <!-- 💡 RWD 與大螢幕配置調整：電腦端 md:overflow-hidden 徹底消除滾動條，md:py-0 實現完美無邊距置中 -->
-    <div id="view-hub" class="w-full h-full flex flex-col items-center justify-start md:justify-center bg-[#f5f5f0] relative px-4 overflow-y-auto md:overflow-hidden py-8 md:py-0 scroll-smooth">
-        <!-- 💡 賽博技術雷達格線底圖 -->
+    <div id="view-hub"
+        class="w-full h-full flex flex-col items-center justify-start md:justify-center bg-[#f5f5f0] relative px-4 overflow-y-auto md:overflow-hidden py-8 md:py-0 scroll-smooth">
+
         <div class="absolute inset-0 pointer-events-none opacity-100 z-0 cyber-grid-bg"></div>
 
         <!-- 技術光暈微光 - 溫暖暖橘 -->
-        <div class="absolute -top-40 -left-40 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
-        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0">
+        </div>
+        <div
+            class="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0">
+        </div>
 
         <!-- 頭部戰術標題 -->
         <div class="text-center mb-6 md:mb-6 max-w-2xl relative z-10">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-none text-[10px] font-mono text-orange-600 mb-3 md:mb-3 tracking-widest uppercase shadow-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.0 // CLOUD
+            <div
+                class="inline-flex items-center gap-2 px-3.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-none text-[10px] font-mono text-orange-600 mb-3 md:mb-3 tracking-widest uppercase shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.0 //
+                CLOUD
             </div>
             <h1 class="text-3xl md:text-4xl font-black tracking-wider text-[#1c1917] mb-2 md:mb-2 uppercase">
-                彈幕泡泡 <span class="text-orange-600">×</span> 照片輪播
+                彈幕泡泡 <span class="text-orange-600">+</span> 照片輪播
             </h1>
             <p class="text-[#78716c] text-xs md:text-sm font-semibold tracking-wider max-w-lg mx-auto leading-relaxed">
                 極致滿版大螢幕投影，配備多軌道物理防撞對話彈幕引擎。請點擊並使用新分頁啟動對應操控模組。
             </p>
         </div>
 
-        <!-- 💡 佈局精細化與對稱修正：將四張卡片的所有 padding, margin 與文字尺寸完全統一，實現完美的像素級對稱 -->
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 max-w-4xl md:max-w-3xl w-full relative z-10 mb-4">
-            <!-- 3合1沙盒開發模式 (新分頁開啟) -->
-            <a href="?view=sandbox" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-                <!-- 💡 戰術四角防撞定位支架 (橘色主題) -->
-                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+            <!-- 3合1開發模式 (新分頁開啟) -->
+            <a href="?view=sandbox" target="_blank"
+                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                <div
+                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ SYSTEM // SANDBOX ]</span>
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ SYSTEM
+                            // SANDBOX ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                     </div>
                     <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
-                        <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 沙盒整合模擬器
+                        <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 整合模擬器
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用沙盒。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">
+                        在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用。</p>
                 </div>
-                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    BOOT SANDBOX <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                <div
+                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    BOOT SANDBOX <i
+                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
 
             <!-- 大螢幕主頁面 (新分頁開啟) -->
-            <a href="?view=screen" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-                <!-- 💡 戰術四角防撞定位支架 -->
-                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+            <a href="?view=screen" target="_blank"
+                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                <div
+                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ DISPLAY // SCREEN ]</span>
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ DISPLAY
+                            // SCREEN ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                     </div>
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-desktop text-sm text-orange-600"></i> 滿版大螢幕投影視圖
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">活動投影布幕或電視牆專用，100% 滿版無干擾。支援事後加上重播網址參數，本機匯入 CSV 重播當天彈幕。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">活動投影布幕或電視牆專用，100%
+                        滿版無干擾。支援事後加上重播網址參數、本機匯入 CSV 重播當天彈幕。</p>
                 </div>
-                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    DEPLOY DISPLAY <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                <div
+                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    DEPLOY DISPLAY <i
+                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
 
             <!-- 手機賓客發送端 (新分頁開啟) -->
-            <a href="?view=mobile" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-                <!-- 💡 戰術四角防撞定位支架 -->
-                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+            <a href="?view=mobile" target="_blank"
+                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                <div
+                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
@@ -195,39 +284,55 @@
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。提供快捷表情包與罐頭破冰語。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。提供罐頭破冰語。</p>
                 </div>
-                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    LAUNCH CLIENT <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                <div
+                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    LAUNCH CLIENT <i
+                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
 
             <!-- 獨立主辦方控制台 (新分頁開啟) -->
-            <a href="?view=admin" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-                <!-- 💡 戰術四角防撞定位支架 -->
-                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+            <a href="?view=admin" target="_blank"
+                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                <div
+                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
+                <div
+                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ ADMIN // CONSOLE ]</span>
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ ADMIN
+                            // CONSOLE ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                     </div>
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-sliders text-sm text-orange-600"></i> 主辦人控制台頁面
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">現場管理人員獨立頁面。可於不干擾投影的前提下即時監控留言、切換定時暖場、並打包儲存 CSV 歷史紀錄。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">
+                        現場管理人員獨立頁面。可於不干擾投影的前提下即時監控留言、切換定時暖場、並打包儲存 CSV 歷史紀錄。</p>
                 </div>
-                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    OPEN CONSOLE <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                <div
+                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    OPEN CONSOLE <i
+                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
                 </div>
             </a>
 
-            <!-- 💡 新增入口：時光重溫祝福回放卡片 (Replay Module) -->
-            <div class="md:col-span-2 group relative flex flex-col justify-between p-6 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl">
-                <!-- 💡 戰術四角防撞定位支架 (重播專用紅橘主題) -->
+            <!-- 新增入口：時光重溫祝福回放卡片 (Replay Module) -->
+            <div
+                class="md:col-span-2 group relative flex flex-col justify-between p-6 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl">
+
                 <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-red-500/40"></div>
                 <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-red-500/40"></div>
                 <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-red-500/40"></div>
@@ -235,17 +340,21 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY // CSV_LOADER ]</span>
+                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY //
+                            CSV_LOADER ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
                     </div>
                     <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-history text-sm text-red-600"></i> 溫馨回溯與歷史祝福回放
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV 祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV
+                        祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
                 </div>
                 <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <input type="file" id="hub-csv-import" accept=".csv" class="hidden" onchange="handleHubCSVImport(event)">
-                    <button onclick="document.getElementById('hub-csv-import').click()" class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-mono font-bold py-3 px-6 text-xs uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2">
+                    <input type="file" id="hub-csv-import" accept=".csv" class="hidden"
+                        onchange="handleHubCSVImport(event)">
+                    <button onclick="document.getElementById('hub-csv-import').click()"
+                        class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-mono font-bold py-3 px-6 text-xs uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-file-import"></i> 載入並重播祝福 (.CSV)
                     </button>
                     <span class="text-[9px] text-stone-400 font-mono font-bold">SUPPORT UTF-8 EXCEL CSV</span>
@@ -260,25 +369,30 @@
 
 
     <!-- ========================================== -->
-    <!-- 2. 🎬 滿版大螢幕投影視圖 (screen)           -->
+    <!-- 2.  滿版大螢幕投影視圖 (screen)           -->
     <!-- ========================================== -->
     <div id="view-screen" class="hidden relative w-full h-full bg-black overflow-hidden select-none">
         <!-- RWD 極致滿版模糊底圖層 -->
-        <div id="bg-blur-container" class="absolute inset-0 w-full h-full scale-110 blur-2xl opacity-75 brightness-[0.4] transition-all duration-1000 z-0">
+        <div id="bg-blur-container"
+            class="absolute inset-0 w-full h-full scale-110 blur-2xl opacity-75 brightness-[0.4] transition-all duration-1000 z-0">
             <!-- 動態注入模糊 background -->
         </div>
 
         <!-- 照片本體顯示層 -->
-        <div id="photo-container" class="absolute inset-0 w-full h-full flex items-center justify-center z-10 p-4 md:p-8">
+        <div id="photo-container"
+            class="absolute inset-0 w-full h-full flex items-center justify-center z-10 p-4 md:p-8">
             <!-- 動態注入前景照 -->
         </div>
 
         <!-- 下半部漸變遮罩 -->
-        <div class="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-20"></div>
+        <div
+            class="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-20">
+        </div>
 
         <!-- 上半部彈幕專屬區 -->
-        <div id="danmaku-area" class="absolute top-0 left-0 right-0 h-[40%] pointer-events-none z-30 select-none overflow-hidden">
-            <!-- 💡 升級：實體三軌道柔性排版網格系統 -->
+        <div id="danmaku-area"
+            class="absolute top-0 left-0 right-0 h-[40%] pointer-events-none z-30 select-none overflow-hidden">
+            <!--  升級：實體三軌道柔性排版網格系統 -->
             <div class="flex flex-col justify-around h-full w-full py-1" id="tracks-container">
                 <div class="relative w-full h-[28%] overflow-visible" id="track-row-0"></div>
                 <div class="relative w-full h-[28%] overflow-visible" id="track-row-1"></div>
@@ -287,29 +401,35 @@
         </div>
 
         <!-- 歷史重播模式控制條 -->
-        <div id="replay-bar" class="hidden absolute top-4 right-4 z-50 glass-panel-dark p-3 rounded-none flex items-center gap-3">
-            <span class="text-xs bg-red-600 text-white font-bold px-2 py-1 rounded-none animate-pulse"><i class="fa-solid fa-film mr-1"></i>重播歷史模式</span>
+        <div id="replay-bar"
+            class="hidden absolute top-4 right-4 z-50 glass-panel-dark p-3 rounded-none flex items-center gap-3">
+            <span class="text-xs bg-red-600 text-white font-bold px-2 py-1 rounded-none animate-pulse"><i
+                    class="fa-solid fa-film mr-1"></i>重播歷史模式</span>
             <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="handleCSVImport(event)">
-            <button onclick="document.getElementById('csv-file-input').click()" class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-none transition">
+            <button onclick="document.getElementById('csv-file-input').click()"
+                class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-none transition">
                 <i class="fa-solid fa-file-csv mr-1"></i>匯入修改好的 CSV
             </button>
-            <button onclick="exitReplayMode()" class="text-stone-300 hover:text-white text-xs"><i class="fa-solid fa-circle-xmark"></i></button>
+            <button onclick="exitReplayMode()" class="text-stone-300 hover:text-white text-xs"><i
+                    class="fa-solid fa-circle-xmark"></i></button>
         </div>
 
-        <!-- 💡 已徹底移除：返回中控按鈕，確保大螢幕現場投影 100% 滿版無干擾且無法任意返回 -->
+
     </div>
 
 
     <!-- ========================================== -->
-    <!-- 3. 📱 賓客手機發送端 (mobile)               -->
+    <!-- 3.  賓客手機發送端 (mobile)               -->
     <!-- ========================================== -->
     <!-- 💡 手機版對齊微調：改為 items-center 完美垂直居中，並設定 overflow-hidden 完全鎖定滾動 -->
-    <div id="view-mobile" class="hidden w-full h-full bg-[#f5f5f0] relative flex justify-center items-center overflow-hidden px-4">
+    <div id="view-mobile"
+        class="hidden w-full h-full bg-[#f5f5f0] relative flex justify-center items-center overflow-hidden px-4">
         <!-- 💡 對齊：賽博技術雷達格線底圖 -->
         <div class="absolute inset-0 pointer-events-none opacity-20 z-0 cyber-grid-bg"></div>
         <div class="absolute w-72 h-72 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
 
-        <div class="w-full max-w-md bg-white border border-stone-300 rounded-none p-6 shadow-2xl flex flex-col justify-between min-h-[500px] relative z-10">
+        <div
+            class="w-full max-w-md bg-white border border-stone-300 rounded-none p-6 shadow-2xl flex flex-col justify-between min-h-[500px] relative z-10">
             <!-- 💡 戰術四角防撞定位支架 -->
             <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
             <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
@@ -343,7 +463,7 @@
                             <i class="fa-solid fa-user"></i>
                         </span>
                         <input type="text" id="guest-name" maxlength="10" placeholder="限 10 字，例：豐仔"
-                               class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none py-3 pl-10 pr-4 text-sm text-stone-900 placeholder-stone-400 outline-none transition font-bold">
+                            class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none py-3 pl-10 pr-4 text-sm text-stone-900 placeholder-stone-400 outline-none transition font-bold">
                     </div>
                 </div>
 
@@ -354,12 +474,13 @@
                         <span class="font-mono text-[9px] text-orange-600">[ MSG // BLESSING ]</span>
                     </label>
                     <div class="relative">
-                        <!-- 💡 修復限制 bypass：使用強效 oninput 機制在使用者進行複製貼上或語音輸入等任何繞過方式時，即時阻擋並自動裁切至 40 字內 -->
+
                         <textarea id="guest-message" maxlength="40" rows="3" placeholder="限 40 字，例：新婚快樂！一定要幸福喔～"
-                                  class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none p-4 text-sm text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
-                                  onkeydown="handleMobileTextareaKey(event)"
-                                  oninput="this.value = this.value.slice(0, 40); updateCharCount();"></textarea>
-                        <span class="absolute bottom-3 right-3 text-[10px] font-mono text-stone-500" id="char-count">0/40</span>
+                            class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none p-4 text-sm text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
+                            onkeydown="handleMobileTextareaKey(event)"
+                            oninput="this.value = this.value.slice(0, 40); updateCharCount();"></textarea>
+                        <span class="absolute bottom-3 right-3 text-[10px] font-mono text-stone-500"
+                            id="char-count">0/40</span>
                     </div>
                 </div>
 
@@ -370,37 +491,47 @@
                         <span class="font-mono text-[9px] text-orange-600">[ FAST // MACRO ]</span>
                     </label>
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="setQuickMessage('新婚快樂！百年好合 💍')" class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">新婚快樂 💍</button>
-                        <button onclick="setQuickMessage('照片超級美，郎才女貌 😍')" class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">郎才女貌 😍</button>
-                        <button onclick="setQuickMessage('開開心心，心想事成 ✨')" class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">心想事成 ✨</button>
+                        <button onclick="setQuickMessage('新婚快樂！百年好合 💍')"
+                            class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">新婚快樂
+                            💍</button>
+                        <button onclick="setQuickMessage('照片超級美，郎才女貌 😍')"
+                            class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">郎才女貌
+                            😍</button>
+                        <button onclick="setQuickMessage('開開心心，心想事成 ✨')"
+                            class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">心想事成
+                            ✨</button>
                     </div>
                 </div>
             </div>
 
             <!-- 送出按鈕與回饋 -->
             <div class="mt-6 pt-4 border-t border-stone-300">
-                <button onclick="sendDanmaku()" id="send-btn" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-black py-4 rounded-none transition duration-150 transform active:scale-95 flex justify-center items-center gap-2 tracking-widest text-sm uppercase shadow-lg shadow-orange-700/20">
+                <button onclick="sendDanmaku()" id="send-btn"
+                    class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-black py-4 rounded-none transition duration-150 transform active:scale-95 flex justify-center items-center gap-2 tracking-widest text-sm uppercase shadow-lg shadow-orange-700/20">
                     <i class="fa-solid fa-paper-plane"></i> 一鍵送出現場祝福
                 </button>
-                <div id="send-success-tip" class="hidden text-center text-xs text-orange-600 font-black mt-2 animate-bounce font-mono tracking-wider">
+                <div id="send-success-tip"
+                    class="hidden text-center text-xs text-orange-600 font-black mt-2 animate-bounce font-mono tracking-wider">
                     <i class="fa-solid fa-circle-check mr-1"></i> STATUS: SENT // QUEUEING IN DISPLAY
                 </div>
             </div>
 
-            <!-- 💡 已徹底移除：返回中控按鈕，確保手機發送端完全封閉 -->
+
         </div>
     </div>
 
 
     <!-- ========================================== -->
-    <!-- 4. 🎛️ 主辦人控制台頁面 (admin)            -->
+    <!-- 4.  主辦人控制台頁面 (admin)            -->
     <!-- ========================================== -->
-    <div id="view-admin" class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
-        <!-- 💡 對齊：賽博技術雷達格線底圖 -->
+    <div id="view-admin"
+        class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
+
         <div class="absolute inset-0 pointer-events-none opacity-20 z-0 cyber-grid-bg"></div>
 
         <!-- 頂部導航 - RWD 自適應排列 -->
-        <header class="bg-white border-b border-stone-300 px-4 md:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+        <header
+            class="bg-white border-b border-stone-300 px-4 md:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-orange-500/10 text-orange-600 border border-orange-500/20">
                     <i class="fa-solid fa-sliders text-xl"></i>
@@ -408,50 +539,60 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="font-black text-lg text-stone-900">主辦人控制中心</h2>
-                        <span class="px-2 py-0.5 border border-stone-300 text-stone-500 font-mono text-[9px] font-bold">SYS_CONSOLE_v1.2</span>
+                        <span
+                            class="px-2 py-0.5 border border-stone-300 text-stone-500 font-mono text-[9px] font-bold">SYS_CONSOLE_v1.2</span>
                     </div>
-                    <p class="text-xs text-stone-500 font-mono font-bold">UID: <span id="user-uid-display" class="text-orange-600">CONNECTING...</span></p>
+                    <p class="text-xs text-stone-500 font-mono font-bold">UID: <span id="user-uid-display"
+                            class="text-orange-600">CONNECTING...</span></p>
                 </div>
             </div>
-            <a href="?" class="w-full sm:w-auto text-center bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 text-xs font-mono font-bold px-4 py-2 rounded-none transition flex items-center justify-center gap-2">
+            <a href="?"
+                class="w-full sm:w-auto text-center bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 text-xs font-mono font-bold px-4 py-2 rounded-none transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-home"></i> RETURN TO HUB
             </a>
         </header>
 
         <!-- 主體內容 - RWD 彈性流動 -->
-        <main class="flex-grow p-4 md:p-6 md:overflow-hidden overflow-visible flex flex-col md:flex-row gap-6 relative z-10">
+        <main
+            class="flex-grow p-4 md:p-6 md:overflow-hidden overflow-visible flex flex-col md:flex-row gap-6 relative z-10">
             <!-- 左側：控制參數與狀態 -->
             <div class="w-full md:w-1/3 flex flex-col gap-6 md:overflow-y-auto">
                 <!-- 系統即時指標 -->
                 <div class="bg-white border border-stone-300 rounded-none p-5 space-y-4 relative shadow-sm">
-                    <!-- 💡 戰術折角 -->
+
                     <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
                     <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
                     <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
                     <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
 
-                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-simple mr-2 text-orange-600"></i>[ INDEX // TELEMETRY ]</h3>
+                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider mb-2"><i
+                            class="fa-solid fa-chart-simple mr-2 text-orange-600"></i>[ INDEX // TELEMETRY ]</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-stone-50 p-4 border border-stone-200">
-                            <span class="text-[9px] font-mono text-stone-500 block uppercase font-bold">REAL_MESSAGE_COUNT</span>
-                            <span class="text-xl font-mono font-black text-emerald-600 mt-1 block" id="admin-count-real">0 條</span>
+                            <span
+                                class="text-[9px] font-mono text-stone-500 block uppercase font-bold">REAL_MESSAGE_COUNT</span>
+                            <span class="text-xl font-mono font-black text-emerald-600 mt-1 block"
+                                id="admin-count-real">0 條</span>
                         </div>
                         <div class="bg-stone-50 p-4 border border-stone-200">
-                            <span class="text-[9px] font-mono text-stone-500 block uppercase font-bold">MOCK_MESSAGES_COUNT</span>
-                            <span class="text-xl font-mono font-black text-orange-600 mt-1 block" id="admin-count-mock">0 條</span>
+                            <span
+                                class="text-[9px] font-mono text-stone-500 block uppercase font-bold">MOCK_MESSAGES_COUNT</span>
+                            <span class="text-xl font-mono font-black text-orange-600 mt-1 block"
+                                id="admin-count-mock">0 條</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 大螢幕播放設置 -->
                 <div class="bg-white border border-stone-300 rounded-none p-5 space-y-5 flex-grow relative shadow-sm">
-                    <!-- 💡 戰術折角 (黃金主題) -->
+
                     <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
                     <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
                     <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
                     <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
 
-                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider mb-2"><i class="fa-solid fa-gears mr-2 text-orange-600"></i>[ CONFIG // INTERACTION ]</h3>
+                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider mb-2"><i
+                            class="fa-solid fa-gears mr-2 text-orange-600"></i>[ CONFIG // INTERACTION ]</h3>
 
                     <!-- 智能暖場開關 -->
                     <div class="bg-stone-50 p-4 border border-stone-200 flex items-center justify-between">
@@ -460,8 +601,11 @@
                             <span class="text-[10px] text-stone-500 font-semibold">當無人留言時，機器人會定時補位</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="mock-switch" class="sr-only peer" checked onchange="toggleMockBot(this.checked)">
-                            <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                            <input type="checkbox" id="mock-switch" class="sr-only peer" checked
+                                onchange="toggleMockBot(this.checked)">
+                            <div
+                                class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500">
+                            </div>
                         </label>
                     </div>
 
@@ -471,43 +615,53 @@
                             <span>SLIDESHOW_INTERVAL</span>
                             <span id="slider-val" class="text-orange-600">8 秒/張</span>
                         </label>
-                        <input type="range" min="5" max="20" value="8" class="w-full accent-orange-500 cursor-pointer" oninput="changePhotoDuration(this.value)">
+                        <input type="range" min="5" max="20" value="8" class="w-full accent-orange-500 cursor-pointer"
+                            oninput="changePhotoDuration(this.value)">
                     </div>
 
                     <!-- 清理大螢幕功能 -->
                     <div class="pt-2">
-                        <button onclick="clearAllScreenDanmakus()" class="w-full bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-2 border-red-300 hover:border-red-500 text-[10px] font-mono font-bold py-3 rounded-none transition flex items-center justify-center gap-2 uppercase tracking-widest">
+                        <button onclick="clearAllScreenDanmakus()"
+                            class="w-full bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-2 border-red-300 hover:border-red-500 text-[10px] font-mono font-bold py-3 rounded-none transition flex items-center justify-center gap-2 uppercase tracking-widest">
                             <i class="fa-solid fa-trash-can"></i> WIPE DISPLAYS (清除畫面上彈幕)
                         </button>
                     </div>
 
                     <!-- 歷史數據備份 & 導出與全新廣播導入 -->
                     <div class="pt-4 border-t border-stone-200 space-y-2">
-                        <button onclick="exportToCSV()" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-mono font-bold py-3.5 rounded-none transition flex items-center justify-center gap-2 tracking-widest text-xs uppercase shadow-md shadow-orange-700/10">
+                        <button onclick="exportToCSV()"
+                            class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-mono font-bold py-3.5 rounded-none transition flex items-center justify-center gap-2 tracking-widest text-xs uppercase shadow-md shadow-orange-700/10">
                             <i class="fa-solid fa-file-excel"></i> EXPORT TO SHEET (.CSV)
                         </button>
 
-                        <!-- 💡 實用新按鈕：控制台直接廣播匯入歷史 CSV 重溫祝福 -->
-                        <input type="file" id="admin-csv-import" accept=".csv" class="hidden" onchange="handleAdminCSVImport(event)">
-                        <button onclick="document.getElementById('admin-csv-import').click()" class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest text-xs">
+                        <!-- 新按鈕：控制台直接廣播匯入歷史 CSV 重溫祝福 -->
+                        <input type="file" id="admin-csv-import" accept=".csv" class="hidden"
+                            onchange="handleAdminCSVImport(event)">
+                        <button onclick="document.getElementById('admin-csv-import').click()"
+                            class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest text-xs">
                             <i class="fa-solid fa-file-import"></i> IMPORT & BROADCAST REPLAY
                         </button>
-                        <span class="text-[9px] font-mono text-stone-500 block text-center font-bold">EXCEL / GOOGLE SHEETS COMPATIBLE UTF-8 FORMAT</span>
+                        <span class="text-[9px] font-mono text-stone-500 block text-center font-bold">EXCEL / GOOGLE
+                            SHEETS COMPATIBLE UTF-8 FORMAT</span>
                     </div>
                 </div>
             </div>
 
             <!-- 右側：歷史發言實時監控 - RWD 彈性高度與滾動 -->
-            <div class="w-full md:w-2/3 h-[450px] md:h-full bg-white border border-stone-300 rounded-none p-4 md:p-5 flex flex-col md:overflow-hidden relative shadow-sm">
-                <!-- 💡 戰術折角 (橘色主題) -->
+            <div
+                class="w-full md:w-2/3 h-[450px] md:h-full bg-white border border-stone-300 rounded-none p-4 md:p-5 flex flex-col md:overflow-hidden relative shadow-sm">
+
                 <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
                 <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
                 <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
                 <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
 
                 <div class="flex items-center justify-between mb-4 pb-3 border-b border-stone-200">
-                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider"><i class="fa-solid fa-list-ul mr-2 text-orange-600"></i>[ MONITOR // MSG LOG ]</h3>
-                    <span class="text-[9px] font-mono border border-stone-300 text-stone-700 px-3 py-1 rounded-none bg-stone-50 font-bold" id="admin-table-total">TOTAL: 0 BLESSINGS</span>
+                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider"><i
+                            class="fa-solid fa-list-ul mr-2 text-orange-600"></i>[ MONITOR // MSG LOG ]</h3>
+                    <span
+                        class="text-[9px] font-mono border border-stone-300 text-stone-700 px-3 py-1 rounded-none bg-stone-50 font-bold"
+                        id="admin-table-total">TOTAL: 0 BLESSINGS</span>
                 </div>
                 <!-- 滾動表格區 -->
                 <div class="flex-grow overflow-y-auto pr-1">
@@ -523,7 +677,8 @@
                         <tbody id="admin-messages-tbody" class="text-xs divide-y divide-stone-200">
                             <!-- 💡 暖色微對比表格內容 -->
                             <tr id="empty-table-row">
-                                <td colspan="4" class="py-12 text-center text-stone-400 font-mono text-[10px] font-bold">
+                                <td colspan="4"
+                                    class="py-12 text-center text-stone-400 font-mono text-[10px] font-bold">
                                     <i class="fa-regular fa-comment-dots text-2xl block mb-2 opacity-50"></i>
                                     LIST EMPTY // WAIT_FOR_INCOMING_TRANSMISSIONS
                                 </td>
@@ -537,19 +692,24 @@
 
 
     <!-- ========================================== -->
-    <!-- 5. 🧪 3合1 沙盒整合模擬器 (sandbox)          -->
+    <!-- 5. 🧪3合1 整合模擬器 (sandbox)          -->
     <!-- ========================================== -->
-    <div id="view-sandbox" class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
-        <!-- 💡 對齊：賽博技術雷達格線底圖 -->
+    <div id="view-sandbox"
+        class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
+
         <div class="absolute inset-0 pointer-events-none opacity-15 z-0 cyber-grid-bg"></div>
 
         <!-- 沙盒頂部導航 - RWD 適應 -->
-        <header class="bg-white border-b border-stone-300 px-4 md:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-10 relative">
+        <header
+            class="bg-white border-b border-stone-300 px-4 md:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-10 relative">
             <div class="flex items-center gap-3">
-                <span class="px-2.5 py-1 border border-orange-500/30 text-orange-600 font-mono text-[9px] font-bold bg-orange-500/10 uppercase tracking-widest"><i class="fa-solid fa-cube mr-1 animate-spin"></i>SANDBOX_SYS // DESTRUCTIVE</span>
+                <span
+                    class="px-2.5 py-1 border border-orange-500/30 text-orange-600 font-mono text-[9px] font-bold bg-orange-500/10 uppercase tracking-widest"><i
+                        class="fa-solid fa-cube mr-1 animate-spin"></i>SANDBOX_SYS // DESTRUCTIVE</span>
                 <h2 class="font-black text-sm md:text-base text-stone-900">3合1 全交互沙盒調試終端</h2>
             </div>
-            <a href="?" class="w-full sm:w-auto text-center bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 text-xs font-mono font-bold px-3 py-1.5 rounded-none transition flex items-center justify-center gap-2">
+            <a href="?"
+                class="w-full sm:w-auto text-center bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 text-xs font-mono font-bold px-3 py-1.5 rounded-none transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-home"></i> EXIT_SANDBOX
             </a>
         </header>
@@ -557,10 +717,12 @@
         <!-- 沙盒內部：分割視窗 - RWD 自適應比例 -->
         <div class="flex-grow flex flex-col lg:flex-row overflow-visible lg:overflow-hidden relative z-10">
             <!-- 左側：發送與控制台面板 (佔 35%) -->
-            <div class="w-full lg:w-[35%] border-b lg:border-b-0 lg:border-r border-stone-300 flex flex-col overflow-y-auto bg-white shadow-sm">
+            <div
+                class="w-full lg:w-[35%] border-b lg:border-b-0 lg:border-r border-stone-300 flex flex-col overflow-y-auto bg-white shadow-sm">
                 <!-- 手機端嵌入區 -->
                 <div class="p-4 border-b border-stone-200">
-                    <span class="text-[9px] font-mono font-bold text-orange-600 uppercase tracking-widest block mb-3"><i class="fa-solid fa-mobile-screen mr-1"></i>[ CLIENT_SIMULATOR // LocalStorage ]</span>
+                    <span class="text-[9px] font-mono font-bold text-orange-600 uppercase tracking-widest block mb-3"><i
+                            class="fa-solid fa-mobile-screen mr-1"></i>[ CLIENT_SIMULATOR // LocalStorage ]</span>
                     <div class="bg-stone-50 p-4 border border-stone-300 space-y-3 relative">
                         <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-orange-500"></div>
                         <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-orange-500"></div>
@@ -568,14 +730,18 @@
                         <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-orange-500"></div>
 
                         <div>
-                            <input type="text" id="sb-guest-name" placeholder="填寫大名" class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none py-2 px-3 text-xs text-stone-900 placeholder-stone-400 outline-none transition font-bold">
+                            <input type="text" id="sb-guest-name" placeholder="填寫大名"
+                                class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none py-2 px-3 text-xs text-stone-900 placeholder-stone-400 outline-none transition font-bold">
                         </div>
                         <div class="relative">
-                            <!-- 💡 限制沙盒發送長度：加入與手機發送端完全一致的 oninput 截斷安全機制，防止模擬調試時爆字數 -->
-                            <textarea id="sb-guest-message" rows="2" placeholder="寫句現場祝福吧..." class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none p-3 text-xs text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold" maxlength="40" oninput="this.value = this.value.slice(0, 40);"></textarea>
+
+                            <textarea id="sb-guest-message" rows="2" placeholder="寫句現場祝福吧..."
+                                class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none p-3 text-xs text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
+                                maxlength="40" oninput="this.value = this.value.slice(0, 40);"></textarea>
                         </div>
                         <div class="flex justify-between items-center gap-3">
-                            <button onclick="sendSandboxDanmaku()" class="flex-grow bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-mono text-[10px] font-bold py-2.5 rounded-none transition flex justify-center items-center gap-1.5 active:scale-95 uppercase tracking-wider">
+                            <button onclick="sendSandboxDanmaku()"
+                                class="flex-grow bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-mono text-[10px] font-bold py-2.5 rounded-none transition flex justify-center items-center gap-1.5 active:scale-95 uppercase tracking-wider">
                                 <i class="fa-solid fa-paper-plane"></i> TRANSMIT
                             </button>
                         </div>
@@ -584,7 +750,8 @@
 
                 <!-- 後台控制嵌入區 -->
                 <div class="p-4 flex-grow space-y-4">
-                    <span class="text-[9px] font-mono font-bold text-orange-600 uppercase tracking-widest block"><i class="fa-solid fa-sliders mr-1"></i>[ CORE_CONFIG // MONITOR ]</span>
+                    <span class="text-[9px] font-mono font-bold text-orange-600 uppercase tracking-widest block"><i
+                            class="fa-solid fa-sliders mr-1"></i>[ CORE_CONFIG // MONITOR ]</span>
 
                     <!-- 機器人控制切換 -->
                     <div class="bg-stone-50 p-4 border border-stone-200 flex items-center justify-between relative">
@@ -598,20 +765,26 @@
                             <span class="text-[9px] text-stone-500 font-semibold">大螢幕空置時自動送上隨機詞庫</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="sb-mock-switch" class="sr-only peer" checked onchange="toggleMockBot(this.checked)">
-                            <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                            <input type="checkbox" id="sb-mock-switch" class="sr-only peer" checked
+                                onchange="toggleMockBot(this.checked)">
+                            <div
+                                class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500">
+                            </div>
                         </label>
                     </div>
 
                     <!-- 一鍵匯出 CSV -->
-                    <button onclick="exportToCSV()" class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono text-[10px] font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest">
+                    <button onclick="exportToCSV()"
+                        class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono text-[10px] font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest">
                         <i class="fa-solid fa-file-excel"></i> EXPORT TO SHEET (.CSV)
                     </button>
 
                     <!-- 一鍵導入 CSV 回放 -->
                     <div class="space-y-2">
-                        <input type="file" id="sb-csv-import" accept=".csv" class="hidden" onchange="handleSandboxCSVImport(event)">
-                        <button onclick="document.getElementById('sb-csv-import').click()" class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono text-[10px] font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest">
+                        <input type="file" id="sb-csv-import" accept=".csv" class="hidden"
+                            onchange="handleSandboxCSVImport(event)">
+                        <button onclick="document.getElementById('sb-csv-import').click()"
+                            class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono text-[10px] font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest">
                             <i class="fa-solid fa-history"></i> LOAD & PLAY REPLAY CSV
                         </button>
                     </div>
@@ -623,12 +796,15 @@
                         <div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-orange-500"></div>
                         <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-orange-500"></div>
 
-                        <span class="text-[9px] font-mono font-bold text-stone-500 block mb-2 uppercase">[ TELEMETRY // PACKET_LOGGER ]</span>
+                        <span class="text-[9px] font-mono font-bold text-stone-500 block mb-2 uppercase">[ TELEMETRY //
+                            PACKET_LOGGER ]</span>
                         <div class="max-h-[140px] overflow-y-auto border border-stone-300 bg-white">
                             <table class="w-full text-left font-mono">
-                                <tbody id="sb-messages-tbody" class="divide-y divide-stone-200 text-[10px] text-stone-600 font-bold">
+                                <tbody id="sb-messages-tbody"
+                                    class="divide-y divide-stone-200 text-[10px] text-stone-600 font-bold">
                                     <tr id="sb-empty-table-row">
-                                        <td class="p-3 text-center text-stone-400 font-bold">PACKET BUFFER EMPTY // IDLE</td>
+                                        <td class="p-3 text-center text-stone-400 font-bold">PACKET BUFFER EMPTY // IDLE
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -638,9 +814,11 @@
             </div>
 
             <!-- 右側：大螢幕嵌入畫面 (佔 65%) -->
-            <div class="w-full lg:w-[65%] min-h-[300px] lg:min-h-0 relative bg-black flex flex-col justify-center items-center">
+            <div
+                class="w-full lg:w-[65%] min-h-[300px] lg:min-h-0 relative bg-black flex flex-col justify-center items-center">
                 <!-- 模擬大螢幕邊框 -->
-                <div class="absolute top-2 left-2 z-50 border border-orange-500/40 bg-stone-900 text-orange-500 font-mono font-bold text-[9px] px-2 py-0.5 shadow tracking-wider uppercase">
+                <div
+                    class="absolute top-2 left-2 z-50 border border-orange-500/40 bg-stone-900 text-orange-500 font-mono font-bold text-[9px] px-2 py-0.5 shadow tracking-wider uppercase">
                     [ LIVE_VIEW_MONITOR // DISPLAY_OUTPUT ]
                 </div>
                 <!-- 嵌入大螢幕視窗 -->
@@ -652,25 +830,25 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 💡 戰術防撞 Stub 函數群：防範 ES 模組非同步載入完成前，因使用者操作而拋出 ReferenceError -->
+    <!--  戰術防撞 Stub 函數群：防範 ES 模組非同步載入完成前，因使用者操作而拋出 ReferenceError -->
     <!-- ========================================== -->
     <script>
-        window.changePhotoDuration = function(val) {};
-        window.saveGuestName = function(val) {};
-        window.setQuickMessage = function(val) {};
-        window.handleMobileTextareaKey = function(e) {};
-        window.updateCharCount = function() {};
-        window.sendDanmaku = function() {};
-        window.sendSandboxDanmaku = function() {};
-        window.toggleMockBot = function(checked) {};
-        window.clearAllScreenDanmakus = function() {};
-        window.exportToCSV = function() {};
-        window.handleCSVImport = function(e) {};
-        window.handleHubCSVImport = function(e) {};
-        window.handleAdminCSVImport = function(e) {};
-        window.handleSandboxCSVImport = function(e) {};
-        window.exitReplayMode = function() {};
-        window.switchView = function(view) {};
+        window.changePhotoDuration = function (val) { };
+        window.saveGuestName = function (val) { };
+        window.setQuickMessage = function (val) { };
+        window.handleMobileTextareaKey = function (e) { };
+        window.updateCharCount = function () { };
+        window.sendDanmaku = function () { };
+        window.sendSandboxDanmaku = function () { };
+        window.toggleMockBot = function (checked) { };
+        window.clearAllScreenDanmakus = function () { };
+        window.exportToCSV = function () { };
+        window.handleCSVImport = function (e) { };
+        window.handleHubCSVImport = function (e) { };
+        window.handleAdminCSVImport = function (e) { };
+        window.handleSandboxCSVImport = function (e) { };
+        window.exitReplayMode = function () { };
+        window.switchView = function (view) { };
     </script>
 
     <!-- ========================================== -->
@@ -697,7 +875,7 @@
             }
         };
 
-        // 💡 隱藏金鑰讀取模式：請先在 Console 中對「你的 API 金鑰」與「你的 AppID」分別執行 btoa("內容")，再將亂碼貼在下方雙引號中。
+        // 隱藏金鑰讀取模式：請先在 Console 中對「你的 API 金鑰」與「你的 AppID」分別執行 btoa("內容")，再將亂碼貼在下方雙引號中。
         // （若在本地開發與沙盒調試環境，則會安全且自動地 fallback 為全自動注入模式，絕不報錯斷線）
         const secureApiKey = decodeBase64Safe("QUl6YVN5RHA1ZUhPUXU0b0dCdWhYMHRFcGU2c2VEV0JHWi04T3FJ");
         const secureAppId = decodeBase64Safe("MTo3NDQzODAyNjk0OTM6d2ViOjRiMTJhN2NhZjRjZmFiNzYyZjRmZmM=");
@@ -733,12 +911,10 @@
         // 核心設定：預設照片清單與高畫質模糊背景
         // ==========================================
         const PRESET_PHOTOS = [
-            "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200", // 婚禮花卉 (橫式)
-            "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200", // 婚宴玻璃杯 (橫式)
-            "https://images.unsplash.com/photo-1507504038482-7621006b307a?auto=format&fit=crop&q=80&w=1200", // 戶外露天婚宴 (直式)
-            "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&q=80&w=1200", // 牽手特寫 (橫式)
-            "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=1200", // 夢幻森林餐會 (橫式)
-            "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&q=80&w=1200"  // 唯美婚禮白紗 (直式)
+            "img/test0.jpg",
+            "img/test02.jpg",
+            "img/test03.jpg",
+            "img/test04.jpg",
         ];
 
         // 模擬自動發言 (暖場) 的趣味詞庫
@@ -747,7 +923,7 @@
             { name: "阿輝", text: "新婚快樂！恭喜恭喜 🎉🎉" },
             { name: "雅婷", text: "天啊，新娘這套白紗簡真仙女下凡 😍" },
             { name: "冠宇", text: "祝福你們白頭偕老，永浴愛河！✨" },
-            { name: "Eva", text: "菜色看起來超高級，先祝老闆加碼高升 💰" },
+            { name: "Allen", text: "菜色看起來好高級，肚子超餓！" },
             { name: "佳豪", text: "新郎今天也太帥了吧！👍" },
             { name: "萱萱", text: "恭喜加入幸福人夫陣營 😂" },
             { name: "美惠", text: "等一下大家有要一起大合照嗎？📷" },
@@ -788,7 +964,7 @@
         // ==========================================
         // 跨分頁通信與廣播接收
         // ==========================================
-        sysChannel.onmessage = function(event) {
+        sysChannel.onmessage = function (event) {
             const data = event.data;
             if (data.type === 'SEND_DANMAKU') {
                 receiveNewDanmaku(data.name, data.text, false, data.timestamp);
@@ -822,7 +998,7 @@
                 document.getElementById('view-hub').classList.remove('hidden');
             } else if (viewName === 'screen') {
                 document.getElementById('view-screen').classList.remove('hidden');
-                // 💡 只有當在獨立「大螢幕投影模式」時，才強制注入 .hide-cursor 隱藏滑鼠游標
+                //  只有當在獨立「大螢幕投影模式」時，才強制注入 .hide-cursor 隱藏滑鼠游標
                 document.getElementById('view-screen').classList.add('hide-cursor');
                 // 將渲染容器綁回獨立 screen
                 moveScreenDOMTo('view-screen');
@@ -916,7 +1092,7 @@
             }, photoDurationSeconds * 1000);
         }
 
-        // 💡 補齊：定時照片切換頻率調控函數 (先前版本遺失導致 ReferenceError)
+        //  補齊：定時照片切換頻率調控函數 (先前版本遺失導致 ReferenceError)
         function changePhotoDuration(sec) {
             photoDurationSeconds = parseInt(sec);
             const valLabel = document.getElementById('slider-val');
@@ -971,7 +1147,7 @@
             let targetPrecedingSpeed = null; // 前車的速度
 
             // 隨機打亂軌道檢查順序 (動態 3 軌)
-            const trackIndices = Array.from({length: NUM_TRACKS}, (_, i) => i).sort(() => Math.random() - 0.5);
+            const trackIndices = Array.from({ length: NUM_TRACKS }, (_, i) => i).sort(() => Math.random() - 0.5);
 
             for (let tIndex of trackIndices) {
                 const lastDanmakuInTrackEl = tracks[tIndex];
@@ -983,7 +1159,7 @@
                     const rect = lastDanmakuInTrackEl.getBoundingClientRect();
                     const precedingRightX = rect.right;
 
-                    // 💡 修復：改為拿實體容器的右側邊界 (containerRightX)
+                    //  修復：改為拿實體容器的右側邊界 (containerRightX)
                     const targetRow = document.getElementById(`track-row-${tIndex}`);
                     const containerRightX = targetRow ? targetRow.getBoundingClientRect().right : screenWidth;
 
@@ -1005,7 +1181,7 @@
 
         // 核心細節調整：全新 LINE / iMessage 對話佈局氣泡渲染
         function launchDanmakuIntoTrack(name, text, trackIndex, precedingSpeed) {
-            // 💡 尋找對應的實體軌道 HTML 容器
+            //  尋找對應的實體軌道 HTML 容器
             const targetRow = document.getElementById(`track-row-${trackIndex}`);
             if (!targetRow) return;
 
@@ -1034,7 +1210,7 @@
             // 清理名字和內容，移除機器人前綴符號
             const cleanName = name.replace(/^🤖\s*/, '');
 
-            // 💡 內裝排版採用縮小優化後的字型與緊湊Padding，加上 whitespace-nowrap 預防名字太長折行爆出軌道
+            //  內裝排版採用縮小優化後的字型與緊湊Padding，加上 whitespace-nowrap 預防名字太長折行爆出軌道
             bubbleContainer.innerHTML = `
                 <span class="responsive-name font-black text-slate-100 px-2.5 py-1 mb-1.5 rounded-lg bg-black/50 backdrop-blur-md shadow-sm border border-white/10 tracking-wide whitespace-nowrap">
                     ${escapeHTML(cleanName)}
@@ -1204,7 +1380,7 @@
         }
 
         // ==========================================
-        // 6. 🎛️ 主辦方控制台邏輯與 CSV 重播數據整合
+        // 6.  主辦方控制台邏輯與 CSV 重播數據整合
         // ==========================================
         async function toggleMockBot(checked) {
             isMockBotEnabled = checked;
@@ -1322,7 +1498,7 @@
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
 
-            const timeStamp = new Date().toISOString().slice(0,10);
+            const timeStamp = new Date().toISOString().slice(0, 10);
             link.setAttribute("href", url);
             link.setAttribute("download", `現場活動彈幕祝福全紀錄_${timeStamp}.csv`);
             link.style.visibility = 'hidden';
@@ -1402,7 +1578,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const playlist = parseCSVBlessings(e.target.result);
                 if (playlist.length > 0) {
                     switchView('screen');
@@ -1421,7 +1597,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const playlist = parseCSVBlessings(e.target.result);
                 if (playlist.length > 0) {
                     sysChannel.postMessage({ type: 'TRIGGER_BROADCAST_REPLAY', playlist: playlist });
@@ -1439,7 +1615,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const playlist = parseCSVBlessings(e.target.result);
                 if (playlist.length > 0) {
                     startReplayWithPlaylist(playlist);
@@ -1456,7 +1632,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const playlist = parseCSVBlessings(e.target.result);
                 if (playlist.length > 0) {
                     startReplayWithPlaylist(playlist);
@@ -1468,7 +1644,7 @@
         }
 
         // ==========================================
-        // 9. 🤖 智能暖場模擬人定時邏輯
+        // 9.  智能暖場模擬人定時邏輯
         // ==========================================
         function resetMockBotTimer() {
             if (mockBotTimer) clearTimeout(mockBotTimer);
@@ -1695,4 +1871,5 @@
         window.switchView = switchView;
     </script>
 </body>
+
 </html>
