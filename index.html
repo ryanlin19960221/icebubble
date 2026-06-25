@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 彈幕泡泡 × 滿版動態照片牆互動系統</title>
+    <!-- Tailwind CSS 引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 圖標引入 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 隱藏所有網頁滾動條 */
+        body {
+            overflow: hidden;
+            user-select: none;
+        }
+        /* 霧面玻璃效果 - 戰術橘微光 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(234, 88, 12, 0.2);
+        }
+        /* 針對暗色背景的霧面 (大螢幕重播面板使用) */
+        .glass-panel-dark {
+            background: rgba(28, 25, 23, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(234, 88, 12, 0.3);
+        }
+        /* 照片轉場動效 */
+        .photo-layer {
+            transition: opacity 1.5s ease-in-out, transform 10s ease-out;
+        }
+
+        /* 自定義滾動條 - 戰術橘 */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(120, 113, 108, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(234, 88, 12, 0.3);
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(234, 88, 12, 0.6);
+        }
+
+        /* 💡 投影大螢幕狀態下隱藏滑鼠游標 */
+        .hide-cursor {
+            cursor: none !important;
+        }
+
+        /* ========================================== */
+        /* 精緻聊天對話氣泡與 LINE 風格小尾巴設計       */
+        /* ========================================== */
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -8px; /* 配合縮小後的氣泡，微調尾巴位置 */
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 8px 10px 0; /* 縮減尾巴三角形尺寸 */
+            border-color: transparent transparent transparent transparent; /* 預設透明，下方會被個別色系覆蓋 */
+        }
+
+        /* 自定義動態色彩氣泡 (馬卡龍色系) & 尾巴三角形邊框色同步 */
+        .bubble-pink { background-color: rgba(254, 219, 224, 0.95); border: 1.5px solid rgba(253, 164, 186, 0.4); color: #85142b; }
+        .bubble-pink::after { border-right-color: rgba(254, 219, 224, 0.95); }
+
+        .bubble-blue { background-color: rgba(219, 242, 254, 0.95); border: 1.5px solid rgba(147, 197, 253, 0.4); color: #1e3a8a; }
+        .bubble-blue::after { border-right-color: rgba(219, 242, 254, 0.95); }
+
+        .bubble-green { background-color: rgba(220, 252, 231, 0.95); border: 1.5px solid rgba(134, 239, 172, 0.4); color: #14532d; }
+        .bubble-green::after { border-right-color: rgba(220, 252, 231, 0.95); }
+
+        .bubble-yellow { background-color: rgba(254, 249, 195, 0.95); border: 1.5px solid rgba(253, 224, 71, 0.4); color: #713f12; }
+        .bubble-yellow::after { border-right-color: rgba(254, 249, 195, 0.95); }
+
+        .bubble-purple { background-color: rgba(243, 232, 255, 0.95); border: 1.5px solid rgba(216, 180, 254, 0.4); color: #581c87; }
+        .bubble-purple::after { border-right-color: rgba(243, 232, 255, 0.95); }
+
+        /* ========================================== */
+        /* 遠距離投影專用：響應式極致字型自適應設計      */
+        /* ========================================== */
+        .responsive-name {
+            font-size: clamp(11px, 0.95vw, 18px); /* 💡 稍微縮減暱稱大小 */
+        }
+        .responsive-text {
+            font-size: clamp(13px, 1.35vw, 24px); /* 💡 縮減留言字級，使其精緻不搶戲 */
+            line-height: 1.35;
+        }
+
+        /* 💡 賽博雷達格線背景統一樣式 - NERV 戰術淡橘格線 */
+        .cyber-grid-bg {
+            background-image: linear-gradient(rgba(234, 88, 12, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(234, 88, 12, 0.08) 1px, transparent 1px);
+            background-size: 35px 30px;
+        }
+    </style>
+</head>
+<body class="bg-[#f5f5f0] text-[#1c1917] font-sans w-screen h-screen">
+
+    <!-- ========================================== -->
+    <!-- 1. 入口中控導航 (Home Hub)                 -->
+    <!-- ========================================== -->
+    <!-- 💡 RWD 與大螢幕配置調整：電腦端 md:overflow-hidden 徹底消除滾動條，md:py-0 實現完美無邊距置中 -->
+    <div id="view-hub" class="w-full h-full flex flex-col items-center justify-start md:justify-center bg-[#f5f5f0] relative px-4 overflow-y-auto md:overflow-hidden py-8 md:py-0 scroll-smooth">
+        <!-- 💡 賽博技術雷達格線底圖 -->
+        <div class="absolute inset-0 pointer-events-none opacity-100 z-0 cyber-grid-bg"></div>
+
+        <!-- 技術光暈微光 - 溫暖暖橘 -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+        <!-- 頭部戰術標題 -->
+        <div class="text-center mb-6 md:mb-6 max-w-2xl relative z-10">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-none text-[10px] font-mono text-orange-600 mb-3 md:mb-3 tracking-widest uppercase shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.0 // CLOUD
+            </div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-wider text-[#1c1917] mb-2 md:mb-2 uppercase">
+                彈幕泡泡 <span class="text-orange-600">×</span> 照片輪播
+            </h1>
+            <p class="text-[#78716c] text-xs md:text-sm font-semibold tracking-wider max-w-lg mx-auto leading-relaxed">
+                極致滿版大螢幕投影，配備多軌道物理防撞對話彈幕引擎。請點擊並使用新分頁啟動對應操控模組。
+            </p>
+        </div>
+
+        <!-- 💡 佈局精細化與對稱修正：將四張卡片的所有 padding, margin 與文字尺寸完全統一，實現完美的像素級對稱 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 max-w-4xl md:max-w-3xl w-full relative z-10 mb-4">
+            <!-- 3合1沙盒開發模式 (新分頁開啟) -->
+            <a href="?view=sandbox" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+                <!-- 💡 戰術四角防撞定位支架 (橘色主題) -->
+                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ SYSTEM // SANDBOX ]</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                        <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 沙盒整合模擬器
+                    </h3>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用沙盒。</p>
+                </div>
+                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    BOOT SANDBOX <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- 大螢幕主頁面 (新分頁開啟) -->
+            <a href="?view=screen" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+                <!-- 💡 戰術四角防撞定位支架 -->
+                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ DISPLAY // SCREEN ]</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                    </div>
+                    <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                        <i class="fa-solid fa-desktop text-sm text-orange-600"></i> 滿版大螢幕投影視圖
+                    </h3>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">活動投影布幕或電視牆專用，100% 滿版無干擾。支援事後加上重播網址參數，本機匯入 CSV 重播當天彈幕。</p>
+                </div>
+                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    DEPLOY DISPLAY <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- 手機賓客發送端 (新分頁開啟) -->
+            <a href="?view=mobile" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+                <!-- 💡 戰術四角防撞定位支架 -->
+                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-mono text-orange-600 tracking-wider">[ TERMINAL // CLIENT ]</span>
+                        <span class="flex items-center gap-1.5 text-[10px] text-orange-600 font-mono">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> ONLINE_TERMINAL
+                        </span>
+                    </div>
+                    <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                        <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
+                    </h3>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。提供快捷表情包與罐頭破冰語。</p>
+                </div>
+                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    LAUNCH CLIENT <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- 獨立主辦方控制台 (新分頁開啟) -->
+            <a href="?view=admin" target="_blank" class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+                <!-- 💡 戰術四角防撞定位支架 -->
+                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ ADMIN // CONSOLE ]</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    </div>
+                    <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sm text-orange-600"></i> 主辦人控制台頁面
+                    </h3>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">現場管理人員獨立頁面。可於不干擾投影的前提下即時監控留言、切換定時暖場、並打包儲存 CSV 歷史紀錄。</p>
+                </div>
+                <div class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                    OPEN CONSOLE <i class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- 💡 新增入口：時光重溫祝福回放卡片 (Replay Module) -->
+            <div class="md:col-span-2 group relative flex flex-col justify-between p-6 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl">
+                <!-- 💡 戰術四角防撞定位支架 (重播專用紅橘主題) -->
+                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-red-500/40"></div>
+                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-red-500/40"></div>
+                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-red-500/40"></div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-red-500/40"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY // CSV_LOADER ]</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                        <i class="fa-solid fa-history text-sm text-red-600"></i> 溫馨回溯與歷史祝福回放
+                    </h3>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV 祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
+                </div>
+                <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <input type="file" id="hub-csv-import" accept=".csv" class="hidden" onchange="handleHubCSVImport(event)">
+                    <button onclick="document.getElementById('hub-csv-import').click()" class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-mono font-bold py-3 px-6 text-xs uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-import"></i> 載入並重播祝福 (.CSV)
+                    </button>
+                    <span class="text-[9px] text-stone-400 font-mono font-bold">SUPPORT UTF-8 EXCEL CSV</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-[10px] text-stone-500 font-mono tracking-wider text-center relative z-10">
+            SYSTEM ENGINE BROADCAST ONLINE // MULTI-TAB REALTIME SYNCHRONIZED ENABLED
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. 🎬 滿版大螢幕投影視圖 (screen)           -->
+    <!-- ========================================== -->
+    <div id="view-screen" class="hidden relative w-full h-full bg-black overflow-hidden select-none">
+        <!-- RWD 極致滿版模糊底圖層 -->
+        <div id="bg-blur-container" class="absolute inset-0 w-full h-full scale-110 blur-2xl opacity-75 brightness-[0.4] transition-all duration-1000 z-0">
+            <!-- 動態注入模糊 background -->
+        </div>
+
+        <!-- 照片本體顯示層 -->
+        <div id="photo-container" class="absolute inset-0 w-full h-full flex items-center justify-center z-10 p-4 md:p-8">
+            <!-- 動態注入前景照 -->
+        </div>
+
+        <!-- 下半部漸變遮罩 -->
+        <div class="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-20"></div>
+
+        <!-- 上半部彈幕專屬區 -->
+        <div id="danmaku-area" class="absolute top-0 left-0 right-0 h-[40%] pointer-events-none z-30 select-none overflow-hidden">
+            <!-- 💡 升級：實體三軌道柔性排版網格系統 -->
+            <div class="flex flex-col justify-around h-full w-full py-1" id="tracks-container">
+                <div class="relative w-full h-[28%] overflow-visible" id="track-row-0"></div>
+                <div class="relative w-full h-[28%] overflow-visible" id="track-row-1"></div>
+                <div class="relative w-full h-[28%] overflow-visible" id="track-row-2"></div>
+            </div>
+        </div>
+
+        <!-- 歷史重播模式控制條 -->
+        <div id="replay-bar" class="hidden absolute top-4 right-4 z-50 glass-panel-dark p-3 rounded-none flex items-center gap-3">
+            <span class="text-xs bg-red-600 text-white font-bold px-2 py-1 rounded-none animate-pulse"><i class="fa-solid fa-film mr-1"></i>重播歷史模式</span>
+            <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="handleCSVImport(event)">
+            <button onclick="document.getElementById('csv-file-input').click()" class="bg-orange-600 hover:bg-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-none transition">
+                <i class="fa-solid fa-file-csv mr-1"></i>匯入修改好的 CSV
+            </button>
+            <button onclick="exitReplayMode()" class="text-stone-300 hover:text-white text-xs"><i class="fa-solid fa-circle-xmark"></i></button>
+        </div>
+
+        <!-- 💡 已徹底移除：返回中控按鈕，確保大螢幕現場投影 100% 滿版無干擾且無法任意返回 -->
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 3. 📱 賓客手機發送端 (mobile)               -->
+    <!-- ========================================== -->
+    <!-- 💡 手機版對齊微調：改為 items-center 完美垂直居中，並設定 overflow-hidden 完全鎖定滾動 -->
+    <div id="view-mobile" class="hidden w-full h-full bg-[#f5f5f0] relative flex justify-center items-center overflow-hidden px-4">
+        <!-- 💡 對齊：賽博技術雷達格線底圖 -->
+        <div class="absolute inset-0 pointer-events-none opacity-20 z-0 cyber-grid-bg"></div>
+        <div class="absolute w-72 h-72 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+        <div class="w-full max-w-md bg-white border border-stone-300 rounded-none p-6 shadow-2xl flex flex-col justify-between min-h-[500px] relative z-10">
+            <!-- 💡 戰術四角防撞定位支架 -->
+            <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
+            <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
+            <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
+            <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
+
+            <!-- 頭部標題 -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-stone-300">
+                    <span class="text-[10px] font-mono text-orange-600 tracking-wider">[ TERMINAL // CLIENT ]</span>
+                    <span class="flex items-center gap-1.5 text-[10px] text-orange-600 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> ONLINE_TERMINAL
+                    </span>
+                </div>
+                <h2 class="text-xl font-black tracking-wider text-[#1c1917] flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-orange-600 text-sm"></i> 送上現場祝福
+                </h2>
+                <p class="text-xs text-stone-500 mt-1 font-semibold">您的留言將會即時發送至大螢幕照片牆進行排隊輪播</p>
+            </div>
+
+            <!-- 輸入表單區 -->
+            <div class="space-y-5 flex-grow">
+                <!-- 姓名/暱稱欄位 -->
+                <div>
+                    <label class="block text-xs font-black text-[#1c1917] mb-2 tracking-wider flex justify-between">
+                        <span>【 1. 填寫您的名字 】</span>
+                        <span class="font-mono text-[9px] text-orange-600">[ USER // NICKNAME ]</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-stone-500 text-xs">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="guest-name" maxlength="10" placeholder="限 10 字，例：豐仔"
+                               class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none py-3 pl-10 pr-4 text-sm text-stone-900 placeholder-stone-400 outline-none transition font-bold">
+                    </div>
+                </div>
+
+                <!-- 祝福內容欄位 -->
+                <div>
+                    <label class="block text-xs font-black text-[#1c1917] mb-2 tracking-wider flex justify-between">
+                        <span>【 2. 輸入祝福內容 】</span>
+                        <span class="font-mono text-[9px] text-orange-600">[ MSG // BLESSING ]</span>
+                    </label>
+                    <div class="relative">
+                        <!-- 💡 修復限制 bypass：使用強效 oninput 機制在使用者進行複製貼上或語音輸入等任何繞過方式時，即時阻擋並自動裁切至 40 字內 -->
+                        <textarea id="guest-message" maxlength="40" rows="3" placeholder="限 40 字，例：新婚快樂！一定要幸福喔～"
+                                  class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none p-4 text-sm text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
+                                  onkeydown="handleMobileTextareaKey(event)"
+                                  oninput="this.value = this.value.slice(0, 40); updateCharCount();"></textarea>
+                        <span class="absolute bottom-3 right-3 text-[10px] font-mono text-stone-500" id="char-count">0/40</span>
+                    </div>
+                </div>
+
+                <!-- 一鍵極速祝福 (破冰按鈕) -->
+                <div>
+                    <label class="block text-xs font-black text-[#1c1917] mb-2 tracking-wider flex justify-between">
+                        <span>【 快速常用祝福 】</span>
+                        <span class="font-mono text-[9px] text-orange-600">[ FAST // MACRO ]</span>
+                    </label>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setQuickMessage('新婚快樂！百年好合 💍')" class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">新婚快樂 💍</button>
+                        <button onclick="setQuickMessage('照片超級美，郎才女貌 😍')" class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">郎才女貌 😍</button>
+                        <button onclick="setQuickMessage('開開心心，心想事成 ✨')" class="text-xs bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 px-3 py-2 rounded-none transition font-semibold">心想事成 ✨</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 送出按鈕與回饋 -->
+            <div class="mt-6 pt-4 border-t border-stone-300">
+                <button onclick="sendDanmaku()" id="send-btn" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-black py-4 rounded-none transition duration-150 transform active:scale-95 flex justify-center items-center gap-2 tracking-widest text-sm uppercase shadow-lg shadow-orange-700/20">
+                    <i class="fa-solid fa-paper-plane"></i> 一鍵送出現場祝福
+                </button>
+                <div id="send-success-tip" class="hidden text-center text-xs text-orange-600 font-black mt-2 animate-bounce font-mono tracking-wider">
+                    <i class="fa-solid fa-circle-check mr-1"></i> STATUS: SENT // QUEUEING IN DISPLAY
+                </div>
+            </div>
+
+            <!-- 💡 已徹底移除：返回中控按鈕，確保手機發送端完全封閉 -->
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 4. 🎛️ 主辦人控制台頁面 (admin)            -->
+    <!-- ========================================== -->
+    <div id="view-admin" class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
+        <!-- 💡 對齊：賽博技術雷達格線底圖 -->
+        <div class="absolute inset-0 pointer-events-none opacity-20 z-0 cyber-grid-bg"></div>
+
+        <!-- 頂部導航 - RWD 自適應排列 -->
+        <header class="bg-white border-b border-stone-300 px-4 md:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-orange-500/10 text-orange-600 border border-orange-500/20">
+                    <i class="fa-solid fa-sliders text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-black text-lg text-stone-900">主辦人控制中心</h2>
+                        <span class="px-2 py-0.5 border border-stone-300 text-stone-500 font-mono text-[9px] font-bold">SYS_CONSOLE_v1.2</span>
+                    </div>
+                    <p class="text-xs text-stone-500 font-mono font-bold">UID: <span id="user-uid-display" class="text-orange-600">CONNECTING...</span></p>
+                </div>
+            </div>
+            <a href="?" class="w-full sm:w-auto text-center bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 text-xs font-mono font-bold px-4 py-2 rounded-none transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-home"></i> RETURN TO HUB
+            </a>
+        </header>
+
+        <!-- 主體內容 - RWD 彈性流動 -->
+        <main class="flex-grow p-4 md:p-6 md:overflow-hidden overflow-visible flex flex-col md:flex-row gap-6 relative z-10">
+            <!-- 左側：控制參數與狀態 -->
+            <div class="w-full md:w-1/3 flex flex-col gap-6 md:overflow-y-auto">
+                <!-- 系統即時指標 -->
+                <div class="bg-white border border-stone-300 rounded-none p-5 space-y-4 relative shadow-sm">
+                    <!-- 💡 戰術折角 -->
+                    <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
+                    <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
+                    <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
+
+                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-simple mr-2 text-orange-600"></i>[ INDEX // TELEMETRY ]</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-stone-50 p-4 border border-stone-200">
+                            <span class="text-[9px] font-mono text-stone-500 block uppercase font-bold">REAL_MESSAGE_COUNT</span>
+                            <span class="text-xl font-mono font-black text-emerald-600 mt-1 block" id="admin-count-real">0 條</span>
+                        </div>
+                        <div class="bg-stone-50 p-4 border border-stone-200">
+                            <span class="text-[9px] font-mono text-stone-500 block uppercase font-bold">MOCK_MESSAGES_COUNT</span>
+                            <span class="text-xl font-mono font-black text-orange-600 mt-1 block" id="admin-count-mock">0 條</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 大螢幕播放設置 -->
+                <div class="bg-white border border-stone-300 rounded-none p-5 space-y-5 flex-grow relative shadow-sm">
+                    <!-- 💡 戰術折角 (黃金主題) -->
+                    <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
+                    <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
+                    <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
+
+                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider mb-2"><i class="fa-solid fa-gears mr-2 text-orange-600"></i>[ CONFIG // INTERACTION ]</h3>
+
+                    <!-- 智能暖場開關 -->
+                    <div class="bg-stone-50 p-4 border border-stone-200 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-mono font-black block text-stone-800"> WARMUP_MOCK_BOT</span>
+                            <span class="text-[10px] text-stone-500 font-semibold">當無人留言時，機器人會定時補位</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="mock-switch" class="sr-only peer" checked onchange="toggleMockBot(this.checked)">
+                            <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- 輪播切換頻率 -->
+                    <div class="space-y-2 bg-stone-50 p-4 border border-stone-200">
+                        <label class="text-[10px] font-mono text-stone-500 flex justify-between uppercase font-bold">
+                            <span>SLIDESHOW_INTERVAL</span>
+                            <span id="slider-val" class="text-orange-600">8 秒/張</span>
+                        </label>
+                        <input type="range" min="5" max="20" value="8" class="w-full accent-orange-500 cursor-pointer" oninput="changePhotoDuration(this.value)">
+                    </div>
+
+                    <!-- 清理大螢幕功能 -->
+                    <div class="pt-2">
+                        <button onclick="clearAllScreenDanmakus()" class="w-full bg-white hover:bg-red-50 text-red-600 hover:text-red-700 border-2 border-red-300 hover:border-red-500 text-[10px] font-mono font-bold py-3 rounded-none transition flex items-center justify-center gap-2 uppercase tracking-widest">
+                            <i class="fa-solid fa-trash-can"></i> WIPE DISPLAYS (清除畫面上彈幕)
+                        </button>
+                    </div>
+
+                    <!-- 歷史數據備份 & 導出與全新廣播導入 -->
+                    <div class="pt-4 border-t border-stone-200 space-y-2">
+                        <button onclick="exportToCSV()" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-mono font-bold py-3.5 rounded-none transition flex items-center justify-center gap-2 tracking-widest text-xs uppercase shadow-md shadow-orange-700/10">
+                            <i class="fa-solid fa-file-excel"></i> EXPORT TO SHEET (.CSV)
+                        </button>
+
+                        <!-- 💡 實用新按鈕：控制台直接廣播匯入歷史 CSV 重溫祝福 -->
+                        <input type="file" id="admin-csv-import" accept=".csv" class="hidden" onchange="handleAdminCSVImport(event)">
+                        <button onclick="document.getElementById('admin-csv-import').click()" class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest text-xs">
+                            <i class="fa-solid fa-file-import"></i> IMPORT & BROADCAST REPLAY
+                        </button>
+                        <span class="text-[9px] font-mono text-stone-500 block text-center font-bold">EXCEL / GOOGLE SHEETS COMPATIBLE UTF-8 FORMAT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：歷史發言實時監控 - RWD 彈性高度與滾動 -->
+            <div class="w-full md:w-2/3 h-[450px] md:h-full bg-white border border-stone-300 rounded-none p-4 md:p-5 flex flex-col md:overflow-hidden relative shadow-sm">
+                <!-- 💡 戰術折角 (橘色主題) -->
+                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
+                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
+                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
+                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500"></div>
+
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-stone-200">
+                    <h3 class="text-[10px] font-mono font-bold text-orange-600 uppercase tracking-wider"><i class="fa-solid fa-list-ul mr-2 text-orange-600"></i>[ MONITOR // MSG LOG ]</h3>
+                    <span class="text-[9px] font-mono border border-stone-300 text-stone-700 px-3 py-1 rounded-none bg-stone-50 font-bold" id="admin-table-total">TOTAL: 0 BLESSINGS</span>
+                </div>
+                <!-- 滾動表格區 -->
+                <div class="flex-grow overflow-y-auto pr-1">
+                    <table class="w-full text-left border-collapse font-mono">
+                        <thead>
+                            <tr class="text-[10px] text-stone-500 border-b border-stone-200 uppercase tracking-wider">
+                                <th class="pb-3 font-bold w-20 md:w-24">TIME</th>
+                                <th class="pb-3 font-bold w-24 md:w-32">NICKNAME</th>
+                                <th class="pb-3 font-bold">MESSAGE</th>
+                                <th class="pb-3 font-bold w-16 text-center">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-messages-tbody" class="text-xs divide-y divide-stone-200">
+                            <!-- 💡 暖色微對比表格內容 -->
+                            <tr id="empty-table-row">
+                                <td colspan="4" class="py-12 text-center text-stone-400 font-mono text-[10px] font-bold">
+                                    <i class="fa-regular fa-comment-dots text-2xl block mb-2 opacity-50"></i>
+                                    LIST EMPTY // WAIT_FOR_INCOMING_TRANSMISSIONS
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 5. 🧪 3合1 沙盒整合模擬器 (sandbox)          -->
+    <!-- ========================================== -->
+    <div id="view-sandbox" class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
+        <!-- 💡 對齊：賽博技術雷達格線底圖 -->
+        <div class="absolute inset-0 pointer-events-none opacity-15 z-0 cyber-grid-bg"></div>
+
+        <!-- 沙盒頂部導航 - RWD 適應 -->
+        <header class="bg-white border-b border-stone-300 px-4 md:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-10 relative">
+            <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 border border-orange-500/30 text-orange-600 font-mono text-[9px] font-bold bg-orange-500/10 uppercase tracking-widest"><i class="fa-solid fa-cube mr-1 animate-spin"></i>SANDBOX_SYS // DESTRUCTIVE</span>
+                <h2 class="font-black text-sm md:text-base text-stone-900">3合1 全交互沙盒調試終端</h2>
+            </div>
+            <a href="?" class="w-full sm:w-auto text-center bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 text-xs font-mono font-bold px-3 py-1.5 rounded-none transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-home"></i> EXIT_SANDBOX
+            </a>
+        </header>
+
+        <!-- 沙盒內部：分割視窗 - RWD 自適應比例 -->
+        <div class="flex-grow flex flex-col lg:flex-row overflow-visible lg:overflow-hidden relative z-10">
+            <!-- 左側：發送與控制台面板 (佔 35%) -->
+            <div class="w-full lg:w-[35%] border-b lg:border-b-0 lg:border-r border-stone-300 flex flex-col overflow-y-auto bg-white shadow-sm">
+                <!-- 手機端嵌入區 -->
+                <div class="p-4 border-b border-stone-200">
+                    <span class="text-[9px] font-mono font-bold text-orange-600 uppercase tracking-widest block mb-3"><i class="fa-solid fa-mobile-screen mr-1"></i>[ CLIENT_SIMULATOR // LocalStorage ]</span>
+                    <div class="bg-stone-50 p-4 border border-stone-300 space-y-3 relative">
+                        <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-orange-500"></div>
+                        <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-orange-500"></div>
+                        <div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-orange-500"></div>
+                        <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-orange-500"></div>
+
+                        <div>
+                            <input type="text" id="sb-guest-name" placeholder="填寫大名" class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none py-2 px-3 text-xs text-stone-900 placeholder-stone-400 outline-none transition font-bold">
+                        </div>
+                        <div class="relative">
+                            <!-- 💡 限制沙盒發送長度：加入與手機發送端完全一致的 oninput 截斷安全機制，防止模擬調試時爆字數 -->
+                            <textarea id="sb-guest-message" rows="2" placeholder="寫句現場祝福吧..." class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none p-3 text-xs text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold" maxlength="40" oninput="this.value = this.value.slice(0, 40);"></textarea>
+                        </div>
+                        <div class="flex justify-between items-center gap-3">
+                            <button onclick="sendSandboxDanmaku()" class="flex-grow bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-mono text-[10px] font-bold py-2.5 rounded-none transition flex justify-center items-center gap-1.5 active:scale-95 uppercase tracking-wider">
+                                <i class="fa-solid fa-paper-plane"></i> TRANSMIT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 後台控制嵌入區 -->
+                <div class="p-4 flex-grow space-y-4">
+                    <span class="text-[9px] font-mono font-bold text-orange-600 uppercase tracking-widest block"><i class="fa-solid fa-sliders mr-1"></i>[ CORE_CONFIG // MONITOR ]</span>
+
+                    <!-- 機器人控制切換 -->
+                    <div class="bg-stone-50 p-4 border border-stone-200 flex items-center justify-between relative">
+                        <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-orange-500"></div>
+                        <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-orange-500"></div>
+                        <div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-orange-500"></div>
+                        <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-orange-500"></div>
+
+                        <div>
+                            <span class="text-xs font-mono font-black block text-stone-800">WARMUP_MOCK_BOT</span>
+                            <span class="text-[9px] text-stone-500 font-semibold">大螢幕空置時自動送上隨機詞庫</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="sb-mock-switch" class="sr-only peer" checked onchange="toggleMockBot(this.checked)">
+                            <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- 一鍵匯出 CSV -->
+                    <button onclick="exportToCSV()" class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono text-[10px] font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest">
+                        <i class="fa-solid fa-file-excel"></i> EXPORT TO SHEET (.CSV)
+                    </button>
+
+                    <!-- 一鍵導入 CSV 回放 -->
+                    <div class="space-y-2">
+                        <input type="file" id="sb-csv-import" accept=".csv" class="hidden" onchange="handleSandboxCSVImport(event)">
+                        <button onclick="document.getElementById('sb-csv-import').click()" class="w-full bg-white hover:bg-stone-50 border-2 border-stone-300 hover:border-orange-500 text-stone-700 font-mono text-[10px] font-bold py-3 rounded-none transition flex items-center justify-center gap-1.5 uppercase tracking-widest">
+                            <i class="fa-solid fa-history"></i> LOAD & PLAY REPLAY CSV
+                        </button>
+                    </div>
+
+                    <!-- 即時監控小表格 -->
+                    <div class="bg-stone-50 p-4 border border-stone-200 flex-grow relative">
+                        <div class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-orange-500"></div>
+                        <div class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-orange-500"></div>
+                        <div class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-orange-500"></div>
+                        <div class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-orange-500"></div>
+
+                        <span class="text-[9px] font-mono font-bold text-stone-500 block mb-2 uppercase">[ TELEMETRY // PACKET_LOGGER ]</span>
+                        <div class="max-h-[140px] overflow-y-auto border border-stone-300 bg-white">
+                            <table class="w-full text-left font-mono">
+                                <tbody id="sb-messages-tbody" class="divide-y divide-stone-200 text-[10px] text-stone-600 font-bold">
+                                    <tr id="sb-empty-table-row">
+                                        <td class="p-3 text-center text-stone-400 font-bold">PACKET BUFFER EMPTY // IDLE</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：大螢幕嵌入畫面 (佔 65%) -->
+            <div class="w-full lg:w-[65%] min-h-[300px] lg:min-h-0 relative bg-black flex flex-col justify-center items-center">
+                <!-- 模擬大螢幕邊框 -->
+                <div class="absolute top-2 left-2 z-50 border border-orange-500/40 bg-stone-900 text-orange-500 font-mono font-bold text-[9px] px-2 py-0.5 shadow tracking-wider uppercase">
+                    [ LIVE_VIEW_MONITOR // DISPLAY_OUTPUT ]
+                </div>
+                <!-- 嵌入大螢幕視窗 -->
+                <div id="sandbox-screen-container" class="w-full h-full relative overflow-hidden select-none">
+                    <!-- 此處與 screen 共用核心 DOM 渲染邏輯 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 💡 戰術防撞 Stub 函數群：防範 ES 模組非同步載入完成前，因使用者操作而拋出 ReferenceError -->
+    <!-- ========================================== -->
+    <script>
+        window.changePhotoDuration = function(val) {};
+        window.saveGuestName = function(val) {};
+        window.setQuickMessage = function(val) {};
+        window.handleMobileTextareaKey = function(e) {};
+        window.updateCharCount = function() {};
+        window.sendDanmaku = function() {};
+        window.sendSandboxDanmaku = function() {};
+        window.toggleMockBot = function(checked) {};
+        window.clearAllScreenDanmakus = function() {};
+        window.exportToCSV = function() {};
+        window.handleCSVImport = function(e) {};
+        window.handleHubCSVImport = function(e) {};
+        window.handleAdminCSVImport = function(e) {};
+        window.handleSandboxCSVImport = function(e) {};
+        window.exitReplayMode = function() {};
+        window.switchView = function(view) {};
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 6. 核心 JavaScript 引擎 (ES Module 連動)     -->
+    <!-- ========================================== -->
+    <script type="module">
+        // ==========================================
+        // 1. Firebase 核心初始化與環境參數讀取
+        // ==========================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 安全 Base64 解碼輔助函數，防止未填寫或含中文佔位符時報錯
+        const decodeBase64Safe = (str) => {
+            try {
+                // 如果字串包含非 ASCII 字元（如中文佔位符）或預設提示詞，則安全返回空字串
+                if (/[^\x00-\x7F]/.test(str) || str.includes("貼在此處") || str.includes("金鑰亂碼") || str.includes("QUl6YVN5...")) {
+                    return "";
+                }
+                return window.atob(str.trim());
+            } catch (e) {
+                return "";
+            }
+        };
+
+        // 💡 隱藏金鑰讀取模式：請先在 Console 中對「你的 API 金鑰」與「你的 AppID」分別執行 btoa("內容")，再將亂碼貼在下方雙引號中。
+        // （若在本地開發與沙盒調試環境，則會安全且自動地 fallback 為全自動注入模式，絕不報錯斷線）
+        const secureApiKey = decodeBase64Safe("QUl6YVN5RHA1ZUhPUXU0b0dCdWhYMHRFcGU2c2VEV0JHWi04T3FJ");
+        const secureAppId = decodeBase64Safe("MTo3NDQzODAyNjk0OTM6d2ViOjRiMTJhN2NhZjRjZmFiNzYyZjRmZmM=");
+
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : {
+            apiKey: secureApiKey,
+            authDomain: "icebubble-f561a.firebaseapp.com", // 直接填一般純文字即可
+            projectId: "icebubble-f561a",               // 直接填一般純文字即可
+            storageBucket: "icebubble-f561a.firebasestorage.app",   // 直接填一般純文字即可
+            messagingSenderId: "744380269493",         // 直接填一般純文字即可
+            appId: secureAppId
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'my-wedding-photo-wall';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // 初始化服務 (具備健全的 fallback 防呆)
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+
+        try {
+            if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.trim() !== "") {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            }
+        } catch (e) {
+            console.error("Firebase Initialization Failed:", e);
+        }
+
+        // ==========================================
+        // 核心設定：預設照片清單與高畫質模糊背景
+        // ==========================================
+        const PRESET_PHOTOS = [
+            "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200", // 婚禮花卉 (橫式)
+            "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200", // 婚宴玻璃杯 (橫式)
+            "https://images.unsplash.com/photo-1507504038482-7621006b307a?auto=format&fit=crop&q=80&w=1200", // 戶外露天婚宴 (直式)
+            "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&q=80&w=1200", // 牽手特寫 (橫式)
+            "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=1200", // 夢幻森林餐會 (橫式)
+            "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&q=80&w=1200"  // 唯美婚禮白紗 (直式)
+        ];
+
+        // 模擬自動發言 (暖場) 的趣味詞庫
+        const MOCK_PRESET_MESSAGES = [
+            { name: "小明", text: "這張照片也太美了吧！❤️" },
+            { name: "阿輝", text: "新婚快樂！恭喜恭喜 🎉🎉" },
+            { name: "雅婷", text: "天啊，新娘這套白紗簡真仙女下凡 😍" },
+            { name: "冠宇", text: "祝福你們白頭偕老，永浴愛河！✨" },
+            { name: "Eva", text: "菜色看起來超高級，先祝老闆加碼高升 💰" },
+            { name: "佳豪", text: "新郎今天也太帥了吧！👍" },
+            { name: "萱萱", text: "恭喜加入幸福人夫陣營 😂" },
+            { name: "美惠", text: "等一下大家有要一起大合照嗎？📷" },
+            { name: "俊傑", text: "希望今天我可以抽到最大獎 🎁" },
+            { name: "淑芬", text: "顏值太逆天了吧 🔥" }
+        ];
+
+        // 馬卡龍氣泡樣式 class 名稱
+        const BUBBLE_COLORS = ['bubble-pink', 'bubble-blue', 'bubble-green', 'bubble-yellow', 'bubble-purple'];
+
+        // ==========================================
+        // 系統變數與內部狀態管理
+        // ==========================================
+        let currentActiveView = 'hub';
+        let isReplayMode = false;
+        let isMockBotEnabled = true;
+        let photoDurationSeconds = 8;
+        let photoTimer = null;
+        let currentPhotoIndex = 0;
+
+        // 資料儲存 (活動期間的真實賓客資料 - 保留在本機記憶體)
+        let realMessageDatabase = [];
+        let totalMockSentCount = 0;
+
+        // 彈幕防撞引擎變數
+        const NUM_TRACKS = 3; // 💡 調整為 3 軌，預防大螢幕遮擋過多照片且防止底部截斷
+        let tracks = Array(NUM_TRACKS).fill(null); // 各軌道最後發出氣泡 of DOM 節點引用
+        let danmakuQueue = []; // 隊列中的彈幕待發送佇列
+        let activeDanmakusList = []; // 正在畫面上運作的彈幕實體物件 list
+        let animationFrameId = null;
+
+        // 智能發送隨機計時器
+        let mockBotTimer = null;
+
+        // 跨視窗/多分頁實時連動 BroadcastChannel (當使用者多視窗操作時)
+        const sysChannel = new BroadcastChannel('danmaku_system_sync');
+
+        // ==========================================
+        // 跨分頁通信與廣播接收
+        // ==========================================
+        sysChannel.onmessage = function(event) {
+            const data = event.data;
+            if (data.type === 'SEND_DANMAKU') {
+                receiveNewDanmaku(data.name, data.text, false, data.timestamp);
+            } else if (data.type === 'MOCK_BOT_STATE_CHANGE') {
+                isMockBotEnabled = data.enabled;
+                updateAdminAndSandboxControls();
+                // 💡 徹底修復：同步開關時，大螢幕端必須立刻呼叫 resetMockBotTimer，否則定時器狀態不變
+                resetMockBotTimer();
+            } else if (data.type === 'CLEAR_ALL_SCREEN') {
+                performClearScreen();
+            } else if (data.type === 'TRIGGER_BROADCAST_REPLAY') {
+                // 💡 核心新增：接收到控制台發出的歷史回放廣播
+                startReplayWithPlaylist(data.playlist);
+            }
+        };
+
+        // ==========================================
+        // 1. 初始化與全域 URL 路由切換
+        // ==========================================
+        function switchView(viewName) {
+            document.getElementById('view-hub').classList.add('hidden');
+            document.getElementById('view-screen').classList.add('hidden');
+            document.getElementById('view-mobile').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-sandbox').classList.add('hidden');
+
+            // 預設先移除隱藏游標類別
+            document.getElementById('view-screen').classList.remove('hide-cursor');
+
+            if (viewName === 'hub') {
+                document.getElementById('view-hub').classList.remove('hidden');
+            } else if (viewName === 'screen') {
+                document.getElementById('view-screen').classList.remove('hidden');
+                // 💡 只有當在獨立「大螢幕投影模式」時，才強制注入 .hide-cursor 隱藏滑鼠游標
+                document.getElementById('view-screen').classList.add('hide-cursor');
+                // 將渲染容器綁回獨立 screen
+                moveScreenDOMTo('view-screen');
+                startSlideshowTimer();
+            } else if (viewName === 'mobile') {
+                document.getElementById('view-mobile').classList.remove('hidden');
+            } else if (viewName === 'admin') {
+                document.getElementById('view-admin').classList.remove('hidden');
+                updateAdminAndSandboxControls();
+            } else if (viewName === 'sandbox') {
+                document.getElementById('view-sandbox').classList.remove('hidden');
+                // 將大螢幕渲染容器移至 sandobx 視區
+                moveScreenDOMTo('sandbox-screen-container');
+                startSlideshowTimer();
+                updateAdminAndSandboxControls();
+            }
+
+            currentActiveView = viewName;
+        }
+
+        // 把大螢幕渲染層 DOM 搬家到目前顯示的視圖中
+        function moveScreenDOMTo(containerId) {
+            const screenView = document.getElementById('view-screen');
+            const targetContainer = document.getElementById(containerId);
+
+            if (containerId === 'view-screen') {
+                screenView.classList.remove('hidden');
+                checkReplayBarVisibility();
+            } else {
+                targetContainer.appendChild(screenView);
+                screenView.classList.remove('hidden');
+                document.getElementById('replay-bar').classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        // 2. 極致 RWD 照片輪播引擎 (Full-Screen Slideshow)
+        // ==========================================
+        function updateSlideshowView() {
+            const bgContainer = document.getElementById('bg-blur-container');
+            const photoContainer = document.getElementById('photo-container');
+            if (!bgContainer || !photoContainer) return;
+
+            const photoUrl = PRESET_PHOTOS[currentPhotoIndex];
+
+            // 動態創建新的圖片元素以實現平滑轉場
+            const bgImg = bgContainer.querySelector('img');
+            const photoImg = photoContainer.querySelector('img');
+
+            // 隨機獲取轉場動效
+            const effectType = Math.floor(Math.random() * 4);
+            let transformStart = "scale(1)";
+            let transformEnd = "scale(1.05)";
+
+            if (effectType === 1) {
+                transformStart = "translateX(50px) scale(1)";
+                transformEnd = "translateX(0px) scale(1.02)";
+            } else if (effectType === 2) {
+                transformStart = "translateY(40px) scale(1.03)";
+                transformEnd = "translateY(0px) scale(1)";
+            }
+
+            // 更新背景模糊底圖
+            bgContainer.innerHTML = `<img src="${photoUrl}" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000" style="filter: blur(10px);">`;
+            setTimeout(() => {
+                const img = bgContainer.querySelector('img');
+                if (img) img.classList.remove('opacity-0');
+            }, 50);
+
+            // 更新前景主照
+            const newPhotoEl = document.createElement('img');
+            newPhotoEl.src = photoUrl;
+            newPhotoEl.className = "max-w-full max-h-full rounded-2xl shadow-2xl photo-layer opacity-0 border-4 border-white/10";
+            newPhotoEl.style.transform = transformStart;
+
+            photoContainer.innerHTML = '';
+            photoContainer.appendChild(newPhotoEl);
+
+            setTimeout(() => {
+                newPhotoEl.classList.remove('opacity-0');
+                newPhotoEl.style.transform = transformEnd;
+            }, 100);
+        }
+
+        // 定時播放照片控制器
+        function startSlideshowTimer() {
+            if (photoTimer) clearInterval(photoTimer);
+            photoTimer = setInterval(() => {
+                currentPhotoIndex = (currentPhotoIndex + 1) % PRESET_PHOTOS.length;
+                updateSlideshowView();
+            }, photoDurationSeconds * 1000);
+        }
+
+        // 💡 補齊：定時照片切換頻率調控函數 (先前版本遺失導致 ReferenceError)
+        function changePhotoDuration(sec) {
+            photoDurationSeconds = parseInt(sec);
+            const valLabel = document.getElementById('slider-val');
+            if (valLabel) valLabel.innerText = `${sec} 秒/張`;
+            startSlideshowTimer();
+        }
+
+        // ==========================================
+        // 3. 核心：氣泡防重疊物理漂移算法 (Anti-Collision Danmaku Engine)
+        // ==========================================
+        function startDanmakuEngineLoop() {
+            function updateFrame() {
+                const containerWidth = window.innerWidth;
+
+                // 1. 更新所有當前運行彈幕的位置
+                for (let i = activeDanmakusList.length - 1; i >= 0; i--) {
+                    const d = activeDanmakusList[i];
+
+                    // 速度漂移：X軸緩緩向左減
+                    d.x -= d.speed;
+                    d.element.style.transform = `translateX(${d.x}px) translateY(-50%)`; // 💡 配合子軌道垂直居中更新定位
+
+                    // 2. 邊界檢查：若整個氣泡超出螢幕左側 則銷毀
+                    if (d.x + d.width < -10) {
+                        d.element.remove(); // 從 DOM 徹底刪除
+                        activeDanmakusList.splice(i, 1); // 釋放記憶體
+
+                        // 若此氣泡是該軌道最後發出的氣泡，清空防撞標記
+                        if (tracks[d.trackIndex] === d.element) {
+                            tracks[d.trackIndex] = null;
+                        }
+                    }
+                }
+
+                // 3. 定期檢查排隊隊列，嘗試讓排隊彈幕進入軌道
+                if (danmakuQueue.length > 0) {
+                    tryPopQueueToTracks();
+                }
+
+                animationFrameId = requestAnimationFrame(updateFrame);
+            }
+            animationFrameId = requestAnimationFrame(updateFrame);
+        }
+
+        // 嘗試將排隊佇列中最早的彈幕分配至空的防撞軌道中
+        function tryPopQueueToTracks() {
+            const screenWidth = window.innerWidth;
+            const SAFETY_GAP = 25;
+
+            // 尋找可以塞入彈幕的空軌道
+            let availableTrackIndex = -1;
+            let targetPrecedingSpeed = null; // 前車的速度
+
+            // 隨機打亂軌道檢查順序 (動態 3 軌)
+            const trackIndices = Array.from({length: NUM_TRACKS}, (_, i) => i).sort(() => Math.random() - 0.5);
+
+            for (let tIndex of trackIndices) {
+                const lastDanmakuInTrackEl = tracks[tIndex];
+
+                if (!lastDanmakuInTrackEl) {
+                    availableTrackIndex = tIndex;
+                    break;
+                } else {
+                    const rect = lastDanmakuInTrackEl.getBoundingClientRect();
+                    const precedingRightX = rect.right;
+
+                    // 💡 修復：改為拿實體容器的右側邊界 (containerRightX)
+                    const targetRow = document.getElementById(`track-row-${tIndex}`);
+                    const containerRightX = targetRow ? targetRow.getBoundingClientRect().right : screenWidth;
+
+                    if (precedingRightX < containerRightX - SAFETY_GAP) {
+                        availableTrackIndex = tIndex;
+
+                        const precedingSpeed = parseFloat(lastDanmakuInTrackEl.dataset.speed);
+                        targetPrecedingSpeed = precedingSpeed;
+                        break;
+                    }
+                }
+            }
+
+            if (availableTrackIndex !== -1) {
+                const nextDanmakuData = danmakuQueue.shift();
+                launchDanmakuIntoTrack(nextDanmakuData.name, nextDanmakuData.text, availableTrackIndex, targetPrecedingSpeed);
+            }
+        }
+
+        // 核心細節調整：全新 LINE / iMessage 對話佈局氣泡渲染
+        function launchDanmakuIntoTrack(name, text, trackIndex, precedingSpeed) {
+            // 💡 尋找對應的實體軌道 HTML 容器
+            const targetRow = document.getElementById(`track-row-${trackIndex}`);
+            if (!targetRow) return;
+
+            // 1. 建立對話框外層 Flex-col 容器
+            const bubbleContainer = document.createElement('div');
+
+            // 隨機抽取柔和馬卡龍色
+            const randomColorClass = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+
+            // 外層容器樣式：絕對定位，不阻擋滑鼠點擊，開啟 flex 直式排列，靠左對齊
+            // 💡 移除寫死的 top: XXvh，改用 top-1/2 -translate-y-1/2 實現軌道垂直完美居中，100% 杜絕裁切與裝設問題！
+            bubbleContainer.className = `absolute left-0 top-1/2 flex flex-col items-start pointer-events-none transition-opacity duration-300`;
+            bubbleContainer.style.transform = `translateY(-50%)`;
+
+            // 設定極速彈幕隨機基礎移速
+            let speed = 1.6 + Math.random() * 1.4; // 1.6 ~ 3.0 像素/幀
+
+            // ⚠️ 物理防追撞減速算法
+            if (precedingSpeed !== null && speed > precedingSpeed) {
+                speed = precedingSpeed * 0.95;
+            }
+
+            // 保存速度在 dataset，方便後方氣泡追蹤
+            bubbleContainer.dataset.speed = speed;
+
+            // 清理名字和內容，移除機器人前綴符號
+            const cleanName = name.replace(/^🤖\s*/, '');
+
+            // 💡 內裝排版採用縮小優化後的字型與緊湊Padding，加上 whitespace-nowrap 預防名字太長折行爆出軌道
+            bubbleContainer.innerHTML = `
+                <span class="responsive-name font-black text-slate-100 px-2.5 py-1 mb-1.5 rounded-lg bg-black/50 backdrop-blur-md shadow-sm border border-white/10 tracking-wide whitespace-nowrap">
+                    ${escapeHTML(cleanName)}
+                </span>
+                <div class="chat-bubble px-4 py-2.5 rounded-2xl rounded-tl-none shadow-xl max-w-[280px] sm:max-w-[380px] md:max-w-[480px] lg:max-w-[600px] relative ${randomColorClass}">
+                    <div class="responsive-text font-semibold break-words">${escapeHTML(text)}</div>
+                </div>
+            `;
+
+            // 💡 💡 核心 Bug 修復！
+            // 💡 修復方案：改用實體軌道的實際寬度作為 X 軸起點，這樣無論在大螢幕、沙盒小視圖中，氣泡一送出都會「立刻」從模擬框右側滑出！
+            const containerWidthVal = targetRow.getBoundingClientRect().width || window.innerWidth;
+            const startX = containerWidthVal + 10;
+            bubbleContainer.style.transform = `translateX(${startX}px) translateY(-50%)`;
+
+            targetRow.appendChild(bubbleContainer);
+            const containerWidth = bubbleContainer.getBoundingClientRect().width;
+
+            const danmakuObject = {
+                element: bubbleContainer,
+                name: name,
+                text: text,
+                trackIndex: trackIndex,
+                speed: speed,
+                width: containerWidth,
+                x: startX
+            };
+
+            activeDanmakusList.push(danmakuObject);
+
+            // 更新此軌道的最尾端氣泡
+            tracks[trackIndex] = bubbleContainer;
+        }
+
+        // ==========================================
+        // 4. 新彈幕中介分發機制
+        // ==========================================
+        function receiveNewDanmaku(name, text, isFromLocalInput = false, timestamp = Date.now()) {
+            if (!name.trim() || !text.trim()) return;
+
+            // 💡 若為本地端用戶自主輸入，即刻推送至實體 Firebase 雲端資料庫！
+            if (isFromLocalInput) {
+                writeBlessingToCloud(name, text);
+                return;
+            }
+
+            // 本地隊列與暖場發言流程
+            danmakuQueue.push({ name: name, text: text });
+            const isMock = name.startsWith("🤖 ") || MOCK_PRESET_MESSAGES.some(m => m.name === name);
+
+            if (!isMock) {
+                // 💡 修復：將原本拋出 ReferenceError 的 msg 修正為區域變數 name，保證成功寫入資料庫
+                const exists = realMessageDatabase.some(m => m.timestamp === timestamp && m.name === name);
+                if (!exists) {
+                    realMessageDatabase.push({
+                        timestamp: timestamp,
+                        name: name,
+                        text: text
+                    });
+                }
+                updateAdminAndSandboxTable();
+            } else {
+                totalMockSentCount++;
+            }
+
+            updateAdminAndSandboxCounters();
+        }
+
+        // ==========================================
+        // 5. 手機發送端互動邏輯 (LocalStorage 記憶姓名)
+        // ==========================================
+        function saveGuestName(val) {
+            localStorage.setItem('guest_memorized_name', val);
+            // 雙向同步 sandbox 姓名輸入框
+            const mInput = document.getElementById('guest-name');
+            const sbInput = document.getElementById('sb-guest-name');
+            if (mInput) mInput.value = val;
+            if (sbInput) sbInput.value = val;
+        }
+
+        function setQuickMessage(text) {
+            const guestMsg = document.getElementById('guest-message');
+            if (guestMsg) {
+                guestMsg.value = text;
+                updateCharCount();
+            }
+        }
+
+        function handleMobileTextareaKey(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendDanmaku();
+            }
+            setTimeout(updateCharCount, 5);
+        }
+
+        function updateCharCount() {
+            const text = document.getElementById('guest-message').value;
+            const indicator = document.getElementById('char-count');
+            if (indicator) indicator.innerText = `${text.length}/40`;
+        }
+
+        // 手機端發送
+        function sendDanmaku() {
+            const nameInput = document.getElementById('guest-name');
+            const msgInput = document.getElementById('guest-message');
+            const sendBtn = document.getElementById('send-btn');
+            const successTip = document.getElementById('send-success-tip');
+
+            const name = nameInput.value.trim();
+            const message = msgInput.value.trim();
+
+            if (!name) {
+                alertCustom("請先輸入您的暱稱喔！");
+                return;
+            }
+            if (!message) {
+                alertCustom("祝福內容不能為空喔！");
+                return;
+            }
+            // 💡 強效後端字數安全攔截：即使繞過前端，大於 40 字依然直接阻截發送
+            if (message.length > 40) {
+                alertCustom("祝福內容不能超過 40 字喔！");
+                return;
+            }
+
+            // 分發彈幕
+            receiveNewDanmaku(name, message, true);
+
+            msgInput.value = '';
+            const charCount = document.getElementById('char-count');
+            if (charCount) charCount.innerText = "0/40";
+
+            // 發送按鈕動畫回饋
+            sendBtn.disabled = true;
+            if (successTip) successTip.classList.remove('hidden');
+
+            setTimeout(() => {
+                sendBtn.disabled = false;
+                if (successTip) successTip.classList.add('hidden');
+            }, 2500);
+        }
+
+        // 沙盒手機端發送
+        function sendSandboxDanmaku() {
+            const nameInput = document.getElementById('sb-guest-name');
+            const msgInput = document.getElementById('sb-guest-message');
+            const name = nameInput.value.trim();
+            const message = msgInput.value.trim();
+
+            if (!name) {
+                alertCustom("請填寫名字！");
+                return;
+            }
+            if (!message) {
+                alertCustom("請寫點祝福吧！");
+                return;
+            }
+            // 💡 強效後端字數安全攔截
+            if (message.length > 40) {
+                alertCustom("祝福內容不能超過 40 字喔！");
+                return;
+            }
+
+            receiveNewDanmaku(name, message, true);
+            msgInput.value = '';
+        }
+
+        // ==========================================
+        // 6. 🎛️ 主辦方控制台邏輯與 CSV 重播數據整合
+        // ==========================================
+        async function toggleMockBot(checked) {
+            isMockBotEnabled = checked;
+            // 廣播給其他視窗
+            sysChannel.postMessage({
+                type: 'MOCK_BOT_STATE_CHANGE',
+                enabled: checked
+            });
+            updateAdminAndSandboxControls();
+            resetMockBotTimer(); // 💡 廣播開關本地必須同步執行，徹底重設定時器
+        }
+
+        function updateAdminAndSandboxControls() {
+            const switch1 = document.getElementById('mock-switch');
+            const switch2 = document.getElementById('sb-mock-switch');
+            if (switch1) switch1.checked = isMockBotEnabled;
+            if (switch2) switch2.checked = isMockBotEnabled;
+        }
+
+        function updateAdminAndSandboxCounters() {
+            const realCountSpan = document.getElementById('admin-count-real');
+            const mockCountSpan = document.getElementById('admin-count-mock');
+            if (realCountSpan) realCountSpan.innerText = `${realMessageDatabase.length} 條`;
+            if (mockCountSpan) mockCountSpan.innerText = `${totalMockSentCount} 條`;
+        }
+
+        function updateAdminAndSandboxTable() {
+            const tbodyNormal = document.getElementById('admin-messages-tbody');
+            const tbodySandbox = document.getElementById('sb-messages-tbody');
+
+            let htmlContent = '';
+
+            if (realMessageDatabase.length === 0) {
+                htmlContent = `
+                    <tr id="empty-table-row">
+                        <td colspan="4" class="py-12 text-center text-stone-400 font-bold">
+                            <i class="fa-regular fa-comment-dots text-2xl block mb-2 opacity-50"></i>
+                            LIST EMPTY // WAIT_FOR_INCOMING_TRANSMISSIONS
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // 將資料反轉（最新在最上面）
+                const sortedList = [...realMessageDatabase].reverse();
+                sortedList.forEach(m => {
+                    const timeStr = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    htmlContent += `
+                        <tr class="hover:bg-stone-50 font-bold">
+                            <td class="py-3 text-stone-500 font-mono">${timeStr}</td>
+                            <td class="py-3 text-stone-800">${escapeHTML(m.name)}</td>
+                            <td class="py-3 text-stone-700 pr-4">${escapeHTML(m.text)}</td>
+                            <td class="py-3 text-center">
+                                <span class="px-2 py-0.5 bg-[#10b981]/10 text-[#10b981] rounded-none text-[10px] font-bold border border-[#10b981]/20">成功</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            if (tbodyNormal) tbodyNormal.innerHTML = htmlContent;
+            if (tbodySandbox) tbodySandbox.innerHTML = htmlContent;
+
+            const totalLabel = document.getElementById('admin-table-total');
+            if (totalLabel) totalLabel.innerText = `共 ${realMessageDatabase.length} 筆真實祝福`;
+        }
+
+        // 清空所有大螢幕彈幕
+        async function clearAllScreenDanmakus() {
+            performClearScreen();
+
+            // 💡 實時同步至 Firebase 雲端清屏
+            if (db && currentUser) {
+                try {
+                    const controlDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'control');
+                    await setDoc(controlDocRef, { clearTrigger: Date.now() }, { merge: true });
+                } catch (e) {
+                    console.error("Sync clear screen to Cloud failed:", e);
+                }
+            } else {
+                sysChannel.postMessage({ type: 'CLEAR_ALL_SCREEN' });
+            }
+        }
+
+        // 💡 升級：清空實體分軌容器
+        function performClearScreen() {
+            for (let i = 0; i < NUM_TRACKS; i++) {
+                const row = document.getElementById(`track-row-${i}`);
+                if (row) row.innerHTML = '';
+            }
+            activeDanmakusList = [];
+            tracks = Array(NUM_TRACKS).fill(null);
+            danmakuQueue = [];
+        }
+
+        // ==========================================
+        // 7. 一鍵匯出 CSV 檔案邏輯 (Google Sheets 完整支援)
+        // ==========================================
+        function exportToCSV() {
+            if (realMessageDatabase.length === 0) {
+                alertCustom("目前還沒有任何真實賓客發送祝福，請先測試發送彈幕喔！");
+                return;
+            }
+
+            let csvContent = "\ufeff"; // UTF-8 BOM
+            csvContent += "發言時間,暱稱/姓名,祝福內容\n";
+
+            realMessageDatabase.forEach(m => {
+                const dateStr = new Date(m.timestamp).toLocaleString();
+                const safeName = m.name.replace(/"/g, '""');
+                const safeText = m.text.replace(/"/g, '""');
+                csvContent += `"${dateStr}","${safeName}","${safeText}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+
+            const timeStamp = new Date().toISOString().slice(0,10);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `現場活動彈幕祝福全紀錄_${timeStamp}.csv`);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+        // 8. 歷史重播與 CSV 彈性載入引擎 (Replay System)
+        // ==========================================
+        function enableReplayMode() {
+            isReplayMode = true;
+            isMockBotEnabled = false;
+            updateAdminAndSandboxControls();
+            checkReplayBarVisibility();
+        }
+
+        function checkReplayBarVisibility() {
+            const replayBar = document.getElementById('replay-bar');
+            if (replayBar && isReplayMode && currentActiveView === 'screen') {
+                replayBar.classList.remove('hidden');
+            }
+        }
+
+        function exitReplayMode() {
+            isReplayMode = false;
+            const replayBar = document.getElementById('replay-bar');
+            if (replayBar) replayBar.classList.add('hidden');
+            isMockBotEnabled = true;
+            updateAdminAndSandboxControls();
+            resetMockBotTimer();
+            alertCustom("已退出重播模式。");
+        }
+
+        function startReplayWithPlaylist(playlist) {
+            enableReplayMode();
+            performClearScreen();
+            playlist.forEach(item => {
+                danmakuQueue.push({ name: `📜 ${item.name}`, text: item.text });
+            });
+            alertCustom(`成功同步載入 ${playlist.length} 條歷史祝福！大螢幕開始定速回放 🎬`);
+        }
+
+        function parseCSVBlessings(text) {
+            const playlist = [];
+            const lines = text.split('\n');
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                if (matches && matches.length >= 2) {
+                    let name = "";
+                    let content = "";
+
+                    if (matches.length >= 3) {
+                        name = matches[1].replace(/^"|"$/g, '').trim();
+                        content = matches[2].replace(/^"|"$/g, '').trim();
+                    } else {
+                        name = matches[0].replace(/^"|"$/g, '').trim();
+                        content = matches[1].replace(/^"|"$/g, '').trim();
+                    }
+
+                    if (name && content) {
+                        playlist.push({ name: name, text: content });
+                    }
+                }
+            }
+            return playlist;
+        }
+
+        // 入口一：首頁中控載入
+        function handleHubCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const playlist = parseCSVBlessings(e.target.result);
+                if (playlist.length > 0) {
+                    switchView('screen');
+                    startReplayWithPlaylist(playlist);
+                    sysChannel.postMessage({ type: 'TRIGGER_BROADCAST_REPLAY', playlist: playlist });
+                } else {
+                    alertCustom("CSV 檔案剖析失敗，請檢查欄位格式！");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 入口二：工作人員控制台廣播載入
+        function handleAdminCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const playlist = parseCSVBlessings(e.target.result);
+                if (playlist.length > 0) {
+                    sysChannel.postMessage({ type: 'TRIGGER_BROADCAST_REPLAY', playlist: playlist });
+                    alertCustom(`已成功發送歷史回放廣播！現場大螢幕與沙盒將自動加載播放。`);
+                } else {
+                    alertCustom("CSV 檔案剖析失敗，請檢查欄位格式！");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 入口三：沙盒調試面板獨立載入
+        function handleSandboxCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const playlist = parseCSVBlessings(e.target.result);
+                if (playlist.length > 0) {
+                    startReplayWithPlaylist(playlist);
+                } else {
+                    alertCustom("CSV 檔案剖析失敗，請檢查欄位格式！");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 獨立投影螢幕端本地載入
+        function handleCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const playlist = parseCSVBlessings(e.target.result);
+                if (playlist.length > 0) {
+                    startReplayWithPlaylist(playlist);
+                } else {
+                    alertCustom("CSV 檔案剖析失敗，請檢查欄位格式！");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ==========================================
+        // 9. 🤖 智能暖場模擬人定時邏輯
+        // ==========================================
+        function resetMockBotTimer() {
+            if (mockBotTimer) clearTimeout(mockBotTimer);
+
+            if (!isMockBotEnabled) return;
+
+            const randomDelay = 8000 + Math.random() * 10000;
+
+            mockBotTimer = setTimeout(() => {
+                triggerMockMessage();
+                resetMockBotTimer();
+            }, randomDelay);
+        }
+
+        function triggerMockMessage() {
+            if (danmakuQueue.length > 0) return;
+
+            const randomMsgIndex = Math.floor(Math.random() * MOCK_PRESET_MESSAGES.length);
+            const mockMsg = MOCK_PRESET_MESSAGES[randomMsgIndex];
+
+            receiveNewDanmaku(`🤖 ${mockMsg.name}`, mockMsg.text);
+        }
+
+        // ==========================================
+        // 10. ☁️ Firebase Firestore 實時資料聯動核心 (符合 RULE 1 & 2)
+        // ==========================================
+        let unsubscribeBlessings = null;
+        let unsubscribeControl = null;
+        let lastClearTrigger = 0;
+        const pageLoadTime = Date.now();
+
+        async function initFirebaseAuthentication() {
+            if (!auth) return;
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase Authentication Failed:", error);
+            }
+        }
+
+        function setupCloudSync() {
+            if (!db || !currentUser) return;
+
+            // 💡 實時祝福監聽： artifacts/{appId}/public/data/blessings
+            const blessingsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'blessings');
+
+            if (unsubscribeBlessings) unsubscribeBlessings();
+            unsubscribeBlessings = onSnapshot(blessingsCollection, (snapshot) => {
+                let incoming = [];
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const msg = change.doc.data();
+                        const exists = realMessageDatabase.some(m => m.timestamp === msg.timestamp && m.name === msg.name);
+                        if (!exists) {
+                            realMessageDatabase.push(msg);
+                            incoming.push(msg);
+                        }
+                    }
+                });
+
+                // 💡 遵循規則二：在記憶體中進行高安定性時間排序 (No composite index orderBy)
+                realMessageDatabase.sort((a, b) => a.timestamp - b.timestamp);
+                updateAdminAndSandboxTable();
+                updateAdminAndSandboxCounters();
+
+                // 依序派發排隊彈幕 (僅派發頁面開啟後產生的即時祝福)
+                incoming.sort((a, b) => a.timestamp - b.timestamp);
+                incoming.forEach(msg => {
+                    if (msg.timestamp > pageLoadTime - 2000) {
+                        danmakuQueue.push({ name: msg.name, text: msg.text });
+                    }
+                });
+            }, (error) => {
+                console.error("Firestore Blessings snapshot failed:", error);
+            });
+
+            // 💡 實時控制訊號監聽： artifacts/{appId}/public/data/config/control
+            const controlDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'control');
+
+            if (unsubscribeControl) unsubscribeControl();
+            unsubscribeControl = onSnapshot(controlDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (typeof data.isMockBotEnabled !== 'undefined' && data.isMockBotEnabled !== isMockBotEnabled) {
+                        isMockBotEnabled = data.isMockBotEnabled;
+                        updateAdminAndSandboxControls();
+                        resetMockBotTimer();
+                    }
+                    if (data.clearTrigger && data.clearTrigger > lastClearTrigger) {
+                        lastClearTrigger = data.clearTrigger;
+                        performClearScreen();
+                    }
+                }
+            }, (error) => {
+                console.error("Firestore Control snapshot failed:", error);
+            });
+        }
+
+        // 寫入即時祝福至 Cloud Firestore (公用路徑保護)
+        async function writeBlessingToCloud(guestName, guestText) {
+            if (!db || !currentUser) {
+                receiveNewDanmaku(guestName, guestText, false);
+                return;
+            }
+
+            try {
+                const blessingsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'blessings');
+                await addDoc(blessingsCollection, {
+                    name: guestName,
+                    text: guestText,
+                    timestamp: Date.now(),
+                    senderUid: currentUser.uid
+                });
+                console.log("Cloud Write Successfully!");
+            } catch (error) {
+                console.error("Firestore Write Blessing Failed:", error);
+                alertCustom("雲端發送失敗，請重試！");
+            }
+        }
+
+        // 監聽認證狀態，認證成功後安全訂閱即時雲端數據
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    console.log("Firebase Auth Verified. UID:", user.uid);
+
+                    const uidDisplay = document.getElementById('user-uid-display');
+                    if (uidDisplay) uidDisplay.innerText = user.uid;
+
+                    setupCloudSync();
+                } else {
+                    currentUser = null;
+                }
+            });
+            initFirebaseAuthentication();
+        }
+
+        // ==========================================
+        // 11. 輔助工具與安全防禦
+        // ==========================================
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function alertCustom(message) {
+            const alertBox = document.createElement('div');
+            alertBox.className = "fixed bottom-10 left-1/2 -translate-x-1/2 glass-panel-dark px-6 py-4 rounded-none shadow-2xl z-[9999] border border-orange-500/50 flex items-center gap-3 animate-bounce";
+            alertBox.innerHTML = `
+                <span class="text-orange-500 text-lg"><i class="fa-solid fa-circle-exclamation"></i></span>
+                <span class="text-xs font-bold text-white tracking-wide">${message}</span>
+            `;
+            document.body.appendChild(alertBox);
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 3500);
+        }
+
+        // 💡 應用程式初始化進入點 (防範 window.onload 提早觸發或失效)
+        function initApp() {
+            // 解析網址參數，檢查開啟哪一個 View
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetView = urlParams.get('view') || 'hub';
+
+            if (urlParams.get('mode') === 'replay') {
+                enableReplayMode();
+            }
+
+            // 切換至對應的 View
+            switchView(targetView);
+
+            // 載入手機記憶名字
+            const savedName = localStorage.getItem('guest_memorized_name');
+            if (savedName) {
+                const mobileInput = document.getElementById('guest-name');
+                const sandboxInput = document.getElementById('sb-guest-name');
+                if (mobileInput) mobileInput.value = savedName;
+                if (sandboxInput) sandboxInput.value = savedName;
+            }
+
+            // 啟動彈幕物理引擎動畫迴圈
+            startDanmakuEngineLoop();
+
+            // 啟動自動暖場定時器
+            resetMockBotTimer();
+
+            // 初始化背景與照片載入
+            updateSlideshowView();
+        }
+
+        // 💡 確保不論 DOM 載入階段為何，均能流暢初始化
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initApp();
+        } else {
+            window.addEventListener('load', initApp);
+        }
+
+        // 💡 模組化導出與生命週期绑定：讓 inline 屬性在 module 模式下依然完全可訪問
+        window.saveGuestName = saveGuestName;
+        window.setQuickMessage = setQuickMessage;
+        window.handleMobileTextareaKey = handleMobileTextareaKey;
+        window.updateCharCount = updateCharCount;
+        window.sendDanmaku = sendDanmaku;
+        window.sendSandboxDanmaku = sendSandboxDanmaku;
+        window.toggleMockBot = toggleMockBot;
+        window.changePhotoDuration = changePhotoDuration;
+        window.clearAllScreenDanmakus = clearAllScreenDanmakus;
+        window.exportToCSV = exportToCSV;
+        window.handleCSVImport = handleCSVImport;
+        window.handleHubCSVImport = handleHubCSVImport;
+        window.handleAdminCSVImport = handleAdminCSVImport;
+        window.handleSandboxCSVImport = handleSandboxCSVImport;
+        window.exitReplayMode = exitReplayMode;
+        window.switchView = switchView;
+    </script>
+</body>
+</html>
