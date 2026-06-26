@@ -173,7 +173,7 @@
                 CLOUD
             </div>
             <h1 class="text-3xl md:text-4xl font-black tracking-wider text-[#1c1917] mb-2 md:mb-2 uppercase">
-                彈幕泡泡 <span class="text-orange-600">+</span> 照片輪播
+                彈幕泡泡 <span class="text-orange-600">×</span> 照片輪播
             </h1>
             <p class="text-[#78716c] text-xs md:text-sm font-semibold tracking-wider max-w-lg mx-auto leading-relaxed">
                 極致滿版大螢幕投影，配備多軌道物理防撞對話彈幕引擎。請點擊並使用新分頁啟動對應操控模組。
@@ -209,7 +209,7 @@
                         <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 整合模擬器
                     </h3>
                     <p class="text-xs text-stone-500 leading-relaxed font-medium">
-                        在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用。</p>
+                        在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用沙盒。</p>
                 </div>
                 <div
                     class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
@@ -245,7 +245,7 @@
                         <i class="fa-solid fa-desktop text-sm text-orange-600"></i> 滿版大螢幕投影視圖
                     </h3>
                     <p class="text-xs text-stone-500 leading-relaxed font-medium">活動投影布幕或電視牆專用，100%
-                        滿版無干擾。支援事後加上重播網址參數、本機匯入 CSV 重播當天彈幕。</p>
+                        滿版無干擾。支援事後加上重播網址參數，本機匯入 CSV 重播當天彈幕。</p>
                 </div>
                 <div
                     class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
@@ -281,7 +281,7 @@
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。提供罐頭破冰語。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。提供快捷表情包與罐頭破冰語。</p>
                 </div>
                 <div
                     class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
@@ -337,15 +337,13 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY //
-                            CSV_LOADER ]</span>
+                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY // CSV_LOADER ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
                     </div>
                     <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-history text-sm text-red-600"></i> 溫馨回溯與歷史祝福回放
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV
-                        祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV 祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
                 </div>
                 <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <input type="file" id="hub-csv-import" accept=".csv" class="hidden"
@@ -366,13 +364,13 @@
 
 
     <!-- ========================================== -->
-    <!-- 2.  滿版大螢幕投影視圖 (screen)           -->
+    <!-- 2. 🎬 滿版大螢幕投影視圖 (screen)           -->
     <!-- ========================================== -->
     <div id="view-screen" class="hidden relative w-full h-full bg-black overflow-hidden select-none">
         <!-- RWD 極致滿版模糊底圖層 -->
         <div id="bg-blur-container"
             class="absolute inset-0 w-full h-full scale-110 blur-2xl opacity-75 brightness-[0.4] transition-all duration-1000 z-0">
-            <!-- 動態注入模糊 background -->
+            <!-- -動態注入模糊 background -->
         </div>
 
         <!-- 照片本體顯示層 -->
@@ -389,7 +387,7 @@
         <!-- 上半部彈幕專屬區 -->
         <div id="danmaku-area"
             class="absolute top-0 left-0 right-0 h-[40%] pointer-events-none z-30 select-none overflow-hidden">
-            <!--  升級：實體三軌道柔性排版網格系統 -->
+            <!-- 💡 升級：實體三軌道柔性排版網格系統 -->
             <div class="flex flex-col justify-around h-full w-full py-1" id="tracks-container">
                 <div class="relative w-full h-[28%] overflow-visible" id="track-row-0"></div>
                 <div class="relative w-full h-[28%] overflow-visible" id="track-row-1"></div>
@@ -416,7 +414,7 @@
 
 
     <!-- ========================================== -->
-    <!-- 3.  賓客手機發送端 (mobile)               -->
+    <!-- 3. 📱 賓客手機發送端 (mobile)               -->
     <!-- ========================================== -->
     <!-- 💡 手機版對齊微調：改為 items-center 完美垂直居中，並設定 overflow-hidden 完全鎖定滾動 -->
     <div id="view-mobile"
@@ -471,7 +469,7 @@
                         <span class="font-mono text-[9px] text-orange-600">[ MSG // BLESSING ]</span>
                     </label>
                     <div class="relative">
-
+                        <!-- 💡 修復限制 bypass：使用強效 oninput 機制在使用者進行複製貼上或語音輸入等任何繞過方式時，即時阻擋並自動裁切至 40 字內 -->
                         <textarea id="guest-message" maxlength="40" rows="3" placeholder="限 40 字，例：新婚快樂！一定要幸福喔～"
                             class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none p-4 text-sm text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
                             onkeydown="handleMobileTextareaKey(event)"
@@ -519,7 +517,7 @@
 
 
     <!-- ========================================== -->
-    <!-- 4.  主辦人控制台頁面 (admin)            -->
+    <!-- 4. 🎛️ 主辦人控制台頁面 (admin)            -->
     <!-- ========================================== -->
     <div id="view-admin"
         class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
@@ -731,7 +729,7 @@
                                 class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none py-2 px-3 text-xs text-stone-900 placeholder-stone-400 outline-none transition font-bold">
                         </div>
                         <div class="relative">
-
+                            <!-- 限制沙盒發送長度：加入與手機發送端完全一致的 oninput 截斷安全機制，防止模擬調試時爆字數 -->
                             <textarea id="sb-guest-message" rows="2" placeholder="寫句現場祝福吧..."
                                 class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none p-3 text-xs text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
                                 maxlength="40" oninput="this.value = this.value.slice(0, 40);"></textarea>
@@ -830,22 +828,86 @@
     <!--  戰術防撞 Stub 函數群：防範 ES 模組非同步載入完成前，因使用者操作而拋出 ReferenceError -->
     <!-- ========================================== -->
     <script>
-        window.changePhotoDuration = function (val) { };
-        window.saveGuestName = function (val) { };
-        window.setQuickMessage = function (val) { };
-        window.handleMobileTextareaKey = function (e) { };
-        window.updateCharCount = function () { };
-        window.sendDanmaku = function () { };
-        window.sendSandboxDanmaku = function () { };
-        window.toggleMockBot = function (checked) { };
-        window.clearAllScreenDanmakus = function () { };
-        window.exportToCSV = function () { };
-        window.handleCSVImport = function (e) { };
-        window.handleHubCSVImport = function (e) { };
-        window.handleAdminCSVImport = function (e) { };
-        window.handleSandboxCSVImport = function (e) { };
-        window.exitReplayMode = function () { };
-        window.switchView = function (view) { };
+        window.changePhotoDuration = function (val) {
+            if (window._changePhotoDurationModule) {
+                window._changePhotoDurationModule(val);
+            }
+        };
+        window.saveGuestName = function (val) {
+            if (window._saveGuestNameModule) {
+                window._saveGuestNameModule(val);
+            }
+        };
+        window.setQuickMessage = function (val) {
+            if (window._setQuickMessageModule) {
+                window._setQuickMessageModule(val);
+            }
+        };
+        window.handleMobileTextareaKey = function (e) {
+            if (window._handleMobileTextareaKeyModule) {
+                window._handleMobileTextareaKeyModule(e);
+            }
+        };
+        window.updateCharCount = function () {
+            if (window._updateCharCountModule) {
+                window._updateCharCountModule();
+            }
+        };
+        window.sendDanmaku = function () {
+            if (window._sendDanmakuModule) {
+                window._sendDanmakuModule();
+            }
+        };
+        window.sendSandboxDanmaku = function () {
+            if (window._sendSandboxDanmakuModule) {
+                window._sendSandboxDanmakuModule();
+            }
+        };
+        window.toggleMockBot = function (checked) {
+            if (window._toggleMockBotModule) {
+                window._toggleMockBotModule(checked);
+            }
+        };
+        window.clearAllScreenDanmakus = function () {
+            if (window._clearAllScreenDanmakusModule) {
+                window._clearAllScreenDanmakusModule();
+            }
+        };
+        window.exportToCSV = function () {
+            if (window._exportToCSVModule) {
+                window._exportToCSVModule();
+            }
+        };
+        window.handleCSVImport = function (e) {
+            if (window._handleCSVImportModule) {
+                window._handleCSVImportModule(e);
+            }
+        };
+        window.handleHubCSVImport = function (e) {
+            if (window._handleHubCSVImportModule) {
+                window._handleHubCSVImportModule(e);
+            }
+        };
+        window.handleAdminCSVImport = function (e) {
+            if (window._handleAdminCSVImportModule) {
+                window._handleAdminCSVImportModule(e);
+            }
+        };
+        window.handleSandboxCSVImport = function (e) {
+            if (window._handleSandboxCSVImportModule) {
+                window._handleSandboxCSVImportModule(e);
+            }
+        };
+        window.exitReplayMode = function () {
+            if (window._exitReplayModeModule) {
+                window._exitReplayModeModule();
+            }
+        };
+        window.switchView = function (view) {
+            if (window._switchViewModule) {
+                window._switchViewModule(view);
+            }
+        };
     </script>
 
     <!-- ========================================== -->
@@ -955,7 +1017,7 @@
         // 智能發送隨機計時器
         let mockBotTimer = null;
 
-        // 跨視窗/多分頁實時連動 BroadcastChannel (當使用者多視窗操作時)
+        // 跨視窗/分頁實時連動 BroadcastChannel (當使用者多視窗操作時)
         const sysChannel = new BroadcastChannel('danmaku_system_sync');
 
         // ==========================================
@@ -1288,94 +1350,6 @@
             if (sbInput) sbInput.value = val;
         }
 
-        function setQuickMessage(text) {
-            const guestMsg = document.getElementById('guest-message');
-            if (guestMsg) {
-                guestMsg.value = text;
-                updateCharCount();
-            }
-        }
-
-        function handleMobileTextareaKey(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendDanmaku();
-            }
-            setTimeout(updateCharCount, 5);
-        }
-
-        function updateCharCount() {
-            const text = document.getElementById('guest-message').value;
-            const indicator = document.getElementById('char-count');
-            if (indicator) indicator.innerText = `${text.length}/40`;
-        }
-
-        // 手機端發送
-        function sendDanmaku() {
-            const nameInput = document.getElementById('guest-name');
-            const msgInput = document.getElementById('guest-message');
-            const sendBtn = document.getElementById('send-btn');
-            const successTip = document.getElementById('send-success-tip');
-
-            const name = nameInput.value.trim();
-            const message = msgInput.value.trim();
-
-            if (!name) {
-                alertCustom("請先輸入您的暱稱喔！");
-                return;
-            }
-            if (!message) {
-                alertCustom("祝福內容不能為空喔！");
-                return;
-            }
-            // 💡 強效後端字數安全攔截：即使繞過前端，大於 40 字依然直接阻截發送
-            if (message.length > 40) {
-                alertCustom("祝福內容不能超過 40 字喔！");
-                return;
-            }
-
-            // 分發彈幕
-            receiveNewDanmaku(name, message, true);
-
-            msgInput.value = '';
-            const charCount = document.getElementById('char-count');
-            if (charCount) charCount.innerText = "0/40";
-
-            // 發送按鈕動畫回饋
-            sendBtn.disabled = true;
-            if (successTip) successTip.classList.remove('hidden');
-
-            setTimeout(() => {
-                sendBtn.disabled = false;
-                if (successTip) successTip.classList.add('hidden');
-            }, 2500);
-        }
-
-        // 沙盒手機端發送
-        function sendSandboxDanmaku() {
-            const nameInput = document.getElementById('sb-guest-name');
-            const msgInput = document.getElementById('sb-guest-message');
-            const name = nameInput.value.trim();
-            const message = msgInput.value.trim();
-
-            if (!name) {
-                alertCustom("請填寫名字！");
-                return;
-            }
-            if (!message) {
-                alertCustom("請寫點祝福吧！");
-                return;
-            }
-            // 💡 強效後端字數安全攔截
-            if (message.length > 40) {
-                alertCustom("祝福內容不能超過 40 字喔！");
-                return;
-            }
-
-            receiveNewDanmaku(name, message, true);
-            msgInput.value = '';
-        }
-
         // ==========================================
         // 6.  主辦方控制台邏輯與 CSV 重播數據整合
         // ==========================================
@@ -1641,7 +1615,7 @@
         }
 
         // ==========================================
-        // 9.  智能暖場模擬人定時邏輯
+        // 9. 🤖 智能暖場模擬人定時邏輯
         // ==========================================
         function resetMockBotTimer() {
             if (mockBotTimer) clearTimeout(mockBotTimer);
@@ -1785,7 +1759,7 @@
         }
 
         // ==========================================
-        // 11. 輔助工具與安全防禦
+        // 11. 輔助工具與安全防禦與模組生命週期绑定
         // ==========================================
         function escapeHTML(str) {
             return str
