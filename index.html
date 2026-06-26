@@ -10,7 +10,6 @@
     <!-- FontAwesome 圖標引入 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-
         body {
             overflow: hidden;
             user-select: none;
@@ -163,7 +162,8 @@
         <div class="text-center mb-6 md:mb-6 max-w-2xl relative z-10">
             <div
                 class="inline-flex items-center gap-2 px-3.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-none text-[10px] font-mono text-orange-600 mb-3 md:mb-3 tracking-widest uppercase shadow-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.1 // CLOUD-DELETE
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.1 //
+                CLOUD-DELETE
             </div>
             <h1 class="text-3xl md:text-4xl font-black tracking-wider text-[#1c1917] mb-2 md:mb-2 uppercase">
                 彈幕泡泡 <span class="text-orange-600">+</span> 照片輪播
@@ -194,7 +194,8 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ SYSTEM // SANDBOX ]</span>
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ SYSTEM
+                            // SANDBOX ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                     </div>
                     <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
@@ -229,7 +230,8 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ DISPLAY // SCREEN ]</span>
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ DISPLAY
+                            // SCREEN ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                     </div>
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
@@ -272,7 +274,8 @@
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage
+                        記憶姓名並支援隨時修改。</p>
                 </div>
                 <div
                     class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
@@ -300,7 +303,8 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ ADMIN // CONSOLE ]</span>
+                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ ADMIN
+                            // CONSOLE ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                     </div>
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
@@ -327,13 +331,15 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY // CSV_LOADER ]</span>
+                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY //
+                            CSV_LOADER ]</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
                     </div>
                     <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-history text-sm text-red-600"></i> 溫馨回溯與歷史祝福回放
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV 祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV
+                        祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
                 </div>
                 <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <input type="file" id="hub-csv-import" accept=".csv" class="hidden"
@@ -895,10 +901,14 @@
         // ==========================================
         // 照片清單與模糊背景
         // ==========================================
-        const PRESET_PHOTOS = [
-            "img/test01.jpg",
-            "img/test03.jpg"
-        ];
+        const TOTAL_PHOTOS = 120;   // 💡 未來總共有幾張照片，就直接把 120 改成該張數！
+        const PHOTO_PREFIX = "img/"; // 照片放在 img 資料夾
+
+        const PRESET_PHOTOS = Array.from({ length: TOTAL_PHOTOS }, (_, i) => {
+            // 自動補零補足兩位數（例如 1 變成 01，9 變成 09，12 保持 12）
+            const fileNumber = String(i + 1).padStart(2, '0');
+            return `${PHOTO_PREFIX}${fileNumber}.webp`;
+        });
 
         // 模擬自動發言 (暖場) 的趣味詞庫
         const MOCK_PRESET_MESSAGES = [
