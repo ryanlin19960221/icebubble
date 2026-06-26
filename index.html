@@ -134,16 +134,13 @@
         /* ========================================== */
         .responsive-name {
             font-size: clamp(11px, 0.95vw, 18px);
-            /* 💡 稍微縮減暱稱大小 */
         }
 
         .responsive-text {
             font-size: clamp(13px, 1.35vw, 24px);
-            /* 💡 縮減留言字級，使其精緻不搶戲 */
             line-height: 1.35;
         }
 
-        /* 💡 賽博雷達格線背景統一樣式 - NERV 戰術淡橘格線 */
         .cyber-grid-bg {
             background-image: linear-gradient(rgba(234, 88, 12, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(234, 88, 12, 0.08) 1px, transparent 1px);
             background-size: 35px 30px;
@@ -692,7 +689,7 @@
 
 
     <!-- ========================================== -->
-    <!-- 5. 🧪3合1 整合模擬器 (sandbox)          -->
+    <!-- 5. 3合1 整合模擬器 (sandbox)          -->
     <!-- ========================================== -->
     <div id="view-sandbox"
         class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
@@ -714,7 +711,7 @@
             </a>
         </header>
 
-        <!-- 沙盒內部：分割視窗 - RWD 自適應比例 -->
+        <!-- 內部：分割視窗 - RWD 自適應比例 -->
         <div class="flex-grow flex flex-col lg:flex-row overflow-visible lg:overflow-hidden relative z-10">
             <!-- 左側：發送與控制台面板 (佔 35%) -->
             <div
@@ -911,7 +908,7 @@
         // 核心設定：預設照片清單與高畫質模糊背景
         // ==========================================
         const PRESET_PHOTOS = [
-            "img/test0.jpg",
+            "img/test01.jpg",
             "img/test02.jpg",
             "img/test03.jpg",
             "img/test04.jpg",
