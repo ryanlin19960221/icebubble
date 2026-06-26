@@ -10,13 +10,13 @@
     <!-- FontAwesome 圖標引入 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 隱藏所有網頁滾動條 */
+
         body {
             overflow: hidden;
             user-select: none;
         }
 
-        /* 霧面玻璃效果 - 戰術橘微光 */
+
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(16px);
@@ -24,7 +24,7 @@
             border: 1px solid rgba(234, 88, 12, 0.2);
         }
 
-        /* 針對暗色背景的霧面 (大螢幕重播面板使用) */
+
         .glass-panel-dark {
             background: rgba(28, 25, 23, 0.85);
             backdrop-filter: blur(12px);
@@ -32,12 +32,12 @@
             border: 1px solid rgba(234, 88, 12, 0.3);
         }
 
-        /* 照片轉場動效 */
+
         .photo-layer {
             transition: opacity 1.5s ease-in-out, transform 10s ease-out;
         }
 
-        /* 自定義滾動條 - 戰術橘 */
+
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -60,25 +60,21 @@
             cursor: none !important;
         }
 
-        /* ========================================== */
+
         /* 精緻聊天對話氣泡與 LINE 風格小尾巴設計       */
-        /* ========================================== */
         .chat-bubble::after {
             content: '';
             position: absolute;
             top: 0;
             left: -8px;
-            /* 配合縮小後的氣泡，微調尾巴位置 */
             width: 0;
             height: 0;
             border-style: solid;
             border-width: 0 8px 10px 0;
-            /* 縮減尾巴三角形尺寸 */
             border-color: transparent transparent transparent transparent;
-            /* 預設透明，下方會被個別色系覆蓋 */
         }
 
-        /* 自定義動態色彩氣泡 (馬卡龍色系) & 尾巴三角形邊框色同步 */
+
         .bubble-pink {
             background-color: rgba(254, 219, 224, 0.95);
             border: 1.5px solid rgba(253, 164, 186, 0.4);
@@ -129,9 +125,7 @@
             border-right-color: rgba(243, 232, 255, 0.95);
         }
 
-        /* ========================================== */
-        /* 遠距離投影專用：響應式極致字型自適應設計      */
-        /* ========================================== */
+
         .responsive-name {
             font-size: clamp(11px, 0.95vw, 18px);
         }
@@ -158,14 +152,14 @@
 
         <div class="absolute inset-0 pointer-events-none opacity-100 z-0 cyber-grid-bg"></div>
 
-        <!-- 技術光暈微光 - 溫暖暖橘 -->
+
         <div class="absolute -top-40 -left-40 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0">
         </div>
         <div
             class="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0">
         </div>
 
-        <!-- 頭部戰術標題 -->
+        <!-- 頭部標題 -->
         <div class="text-center mb-6 md:mb-6 max-w-2xl relative z-10">
             <div
                 class="inline-flex items-center gap-2 px-3.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-none text-[10px] font-mono text-orange-600 mb-3 md:mb-3 tracking-widest uppercase shadow-sm">
@@ -175,13 +169,13 @@
                 彈幕泡泡 <span class="text-orange-600">+</span> 照片輪播
             </h1>
             <p class="text-[#78716c] text-xs md:text-sm font-semibold tracking-wider max-w-lg mx-auto leading-relaxed">
-                極致滿版大螢幕投影，配備多軌道物理防撞對話彈幕引擎。請點擊並使用新分頁啟動對應操控模組。
+                極致滿版大螢幕投影，配備多軌道物理防撞對話彈幕引擎。點擊並使用新分頁啟動對應操控模組。
             </p>
         </div>
 
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 max-w-4xl md:max-w-3xl w-full relative z-10 mb-4">
-            <!-- 3合1開發模式 (新分頁開啟) -->
+            <!-- 3合1開發模式 -->
             <a href="?view=sandbox" target="_blank"
                 class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
 
@@ -207,7 +201,7 @@
                         <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 整合模擬器
                     </h3>
                     <p class="text-xs text-stone-500 leading-relaxed font-medium">
-                        在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用沙盒。</p>
+                        在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用。</p>
                 </div>
                 <div
                     class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
@@ -216,7 +210,7 @@
                 </div>
             </a>
 
-            <!-- 大螢幕主頁面 (新分頁開啟) -->
+            <!-- 大螢幕主頁面 -->
             <a href="?view=screen" target="_blank"
                 class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
 
@@ -251,7 +245,7 @@
                 </div>
             </a>
 
-            <!-- 手機賓客發送端 (新分頁開啟) -->
+            <!-- 手機賓客發送端 -->
             <a href="?view=mobile" target="_blank"
                 class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
 
@@ -278,7 +272,7 @@
                     <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
                         <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
                     </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。提供快捷表情包與罐頭破冰語。</p>
+                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage 記憶姓名並支援隨時修改。</p>
                 </div>
                 <div
                     class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
@@ -287,7 +281,7 @@
                 </div>
             </a>
 
-            <!-- 獨立主辦方控制台 (新分頁開啟) -->
+            <!-- 獨立主辦方控制台 -->
             <a href="?view=admin" target="_blank"
                 class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
 
@@ -360,7 +354,7 @@
 
 
     <!-- ========================================== -->
-    <!-- 2. 🎬 滿版大螢幕投影視圖 (screen)           -->
+    <!-- 2. 滿版大螢幕投影視圖 (screen)           -->
     <!-- ========================================== -->
     <div id="view-screen" class="hidden relative w-full h-full bg-black overflow-hidden select-none">
         <!-- RWD 極致滿版模糊底圖層 -->
@@ -383,7 +377,7 @@
         <!-- 上半部彈幕專屬區 -->
         <div id="danmaku-area"
             class="absolute top-0 left-0 right-0 h-[40%] pointer-events-none z-30 select-none overflow-hidden">
-            <!-- 💡 升級：實體三軌道柔性排版網格系統 -->
+            <!-- 實體三軌道柔性排版網格系統 -->
             <div class="flex flex-col justify-around h-full w-full py-1" id="tracks-container">
                 <div class="relative w-full h-[28%] overflow-visible" id="track-row-0"></div>
                 <div class="relative w-full h-[28%] overflow-visible" id="track-row-1"></div>
@@ -410,18 +404,18 @@
 
 
     <!-- ========================================== -->
-    <!-- 3. 📱 賓客手機發送端 (mobile)               -->
+    <!-- 3. 賓客手機發送端 (mobile)               -->
     <!-- ========================================== -->
-    <!-- 💡 手機版對齊微調：改為 items-center 完美垂直居中，並設定 overflow-hidden 完全鎖定滾動 -->
+    <!-- 手機版對齊微調：改為 items-center 完美垂直居中，並設定 overflow-hidden 完全鎖定滾動 -->
     <div id="view-mobile"
         class="hidden w-full h-full bg-[#f5f5f0] relative flex justify-center items-center overflow-hidden px-4">
-        <!-- 💡 對齊：賽博技術雷達格線底圖 -->
+
         <div class="absolute inset-0 pointer-events-none opacity-20 z-0 cyber-grid-bg"></div>
         <div class="absolute w-72 h-72 bg-orange-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
 
         <div
             class="w-full max-w-md bg-white border border-stone-300 rounded-none p-6 shadow-2xl flex flex-col justify-between min-h-[500px] relative z-10">
-            <!-- 💡 戰術四角防撞定位支架 -->
+
             <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500"></div>
             <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500"></div>
             <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500"></div>
@@ -465,7 +459,7 @@
                         <span class="font-mono text-[9px] text-orange-600">[ MSG // BLESSING ]</span>
                     </label>
                     <div class="relative">
-                        <!-- 💡 修復限制 bypass：使用強效 oninput 機制在使用者進行複製貼上或語音輸入等任何繞過方式時，即時阻擋並自動裁切至 40 字內 -->
+
                         <textarea id="guest-message" maxlength="40" rows="3" placeholder="限 40 字，例：新婚快樂！一定要幸福喔～"
                             class="w-full bg-[#fcfcf9] border-2 border-stone-300 focus:border-orange-500 rounded-none p-4 text-sm text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
                             onkeydown="handleMobileTextareaKey(event)"
@@ -475,7 +469,7 @@
                     </div>
                 </div>
 
-                <!-- 一鍵極速祝福 (破冰按鈕) -->
+                <!-- 一鍵極速祝福 -->
                 <div>
                     <label class="block text-xs font-black text-[#1c1917] mb-2 tracking-wider flex justify-between">
                         <span>【 快速常用祝福 】</span>
@@ -513,7 +507,7 @@
 
 
     <!-- ========================================== -->
-    <!-- 4. 🎛️ 主辦人控制台頁面 (admin)            -->
+    <!-- 4. 主辦人控制台頁面 (admin)            -->
     <!-- ========================================== -->
     <div id="view-admin"
         class="hidden w-full h-full bg-[#f5f5f0] relative flex flex-col md:overflow-hidden overflow-y-auto">
@@ -690,7 +684,7 @@
 
         <div class="absolute inset-0 pointer-events-none opacity-15 z-0 cyber-grid-bg"></div>
 
-        <!-- 沙盒頂部導航 - RWD 適應 -->
+
         <header
             class="bg-white border-b border-stone-300 px-4 md:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 z-10 relative">
             <div class="flex items-center gap-3">
@@ -725,7 +719,7 @@
                                 class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none py-2 px-3 text-xs text-stone-900 placeholder-stone-400 outline-none transition font-bold">
                         </div>
                         <div class="relative">
-                            <!-- 限制沙盒發送長度：加入與手機發送端完全一致的 oninput 截斷安全機制，防止模擬調試時爆字數 -->
+                            <!-- 限制發送長度：加入與手機發送端完全一致的 oninput 截斷安全機制，防止模擬調試時爆字數 -->
                             <textarea id="sb-guest-message" rows="2" placeholder="寫句現場祝福吧..."
                                 class="w-full bg-white border-2 border-stone-300 focus:border-orange-500 rounded-none p-3 text-xs text-stone-900 placeholder-stone-400 outline-none resize-none transition font-bold"
                                 maxlength="40" oninput="this.value = this.value.slice(0, 40);"></textarea>
@@ -899,7 +893,7 @@
         }
 
         // ==========================================
-        // 核心設定：預設照片清單與高畫質模糊背景
+        // 照片清單與模糊背景
         // ==========================================
         const PRESET_PHOTOS = [
             "img/test01.jpg",
@@ -1103,7 +1097,7 @@
 
                     // 速度漂移：X軸緩緩向左減
                     d.x -= d.speed;
-                    d.element.style.transform = `translateX(${d.x}px) translateY(-50%)`; // 💡 配合子軌道垂直居中更新定位
+                    d.element.style.transform = `translateX(${d.x}px) translateY(-50%)`;
 
                     // 2. 邊界檢查：若整個氣泡超出螢幕左側 則銷毀
                     if (d.x + d.width < -10) {
@@ -1182,7 +1176,6 @@
             const randomColorClass = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
 
             // 外層容器樣式：絕對定位，不阻擋滑鼠點擊，開啟 flex 直式排列，靠左對齊
-            // 💡 移除寫死的 top: XXvh，改用 top-1/2 -translate-y-1/2 實現軌道垂直完美居中，100% 杜絕裁切與裝設問題！
             bubbleContainer.className = `absolute left-0 top-1/2 flex flex-col items-start pointer-events-none transition-opacity duration-300`;
             bubbleContainer.style.transform = `translateY(-50%)`;
 
@@ -1210,8 +1203,8 @@
                 </div>
             `;
 
-            // 💡 💡 核心 Bug 修復！
-            // 💡 修復方案：改用實體軌道的實際寬度作為 X 軸起點，這樣無論在大螢幕、沙盒小視圖中，氣泡一送出都會「立刻」從模擬框右側滑出！
+            //  Bug 修復！
+            // 修復方案：改用實體軌道的實際寬度作為 X 軸起點，這樣無論在大螢幕、沙盒小視圖中，氣泡一送出都會「立刻」從模擬框右側滑出！
             const containerWidthVal = targetRow.getBoundingClientRect().width || window.innerWidth;
             const startX = containerWidthVal + 10;
             bubbleContainer.style.transform = `translateX(${startX}px) translateY(-50%)`;
