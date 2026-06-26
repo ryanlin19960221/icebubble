@@ -879,14 +879,14 @@
 
         const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : {
             apiKey: secureApiKey,
-            authDomain: "icebubble-f561a.firebaseapp.com", // 直接填一般純文字即可
-            projectId: "icebubble-f561a",               // 直接填一般純文字即可
-            storageBucket: "icebubble-f561a.firebasestorage.app",   // 直接填一般純文字即可
-            messagingSenderId: "744380269493",         // 直接填一般純文字即可
+            authDomain: "icebubble-f561a.firebaseapp.com",
+            projectId: "icebubble-f561a",
+            storageBucket: "icebubble-f561a.firebasestorage.app",
+            messagingSenderId: "744380269493",
             appId: secureAppId
         };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'my-wedding-photo-wall';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'icebubble-f561a';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // 初始化服務 (具備健全的 fallback 防呆)
