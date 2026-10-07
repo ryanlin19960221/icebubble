@@ -852,6 +852,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, addDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
         // 安全 Base64 解碼輔助函數，防止未填寫或含中文佔位符時報錯
         const decodeBase64Safe = (str) => {
@@ -868,31 +869,39 @@
 
         // 隱藏金鑰讀取模式：請先在 Console 中對「你的 API 金鑰」與「你的 AppID」分別執行 btoa("內容")，再將亂碼貼在下方雙引號中。
         // （若在本地開發與沙盒調試環境，則會安全且自動地 fallback 為全自動注入模式，絕不報錯斷線）
-        const secureApiKey = decodeBase64Safe("QUl6YVN5RHA1ZUhPUXU0b0dCdWhYMHRFcGU2c2VEV0JHWi04T3FJ");
-        const secureAppId = decodeBase64Safe("MTo3NDQzODAyNjk0OTM6d2ViOjRiMTJhN2NhZjRjZmFiNzYyZjRmZmM=");
+        const secureApiKey = decodeBase64Safe("QUl6YVN5RFFkMTZHRVVRSTRWM2JCbkhJV2wtOEVld0hMdHYxSmJn");
+        const secureAppId = decodeBase64Safe("MToxOTcwNzI1MDg4NjA6d2ViOjc4NWNhNTE2OTAzOGViY2ZiYWJkYjk=");
 
         const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : {
-            apiKey: secureApiKey,
-            authDomain: "icebubble-f561a.firebaseapp.com",
-            projectId: "icebubble-f561a",
-            storageBucket: "icebubble-f561a.firebasestorage.app",
-            messagingSenderId: "744380269493",
-            appId: secureAppId
+            apiKey: secureApiKey || "AIzaSyDQd16GEUQH4V3bBnHIWl-8EewHLtv1Jbg",
+            authDomain: "wedding-e0b40.firebaseapp.com",
+            projectId: "wedding-e0b40",
+            storageBucket: "wedding-e0b40.firebasestorage.app",
+            messagingSenderId: "197072508860",
+            appId: secureAppId || "1:197072508860:web:785ca5169038ebcfbabdb9",
+            measurementId: "G-TKB8FQX60B"
         };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'icebubble-f561a';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wedding-e0b40';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // 初始化服務 (具備健全的 fallback 防呆)
+        let app = null;
         let db = null;
         let auth = null;
         let currentUser = null;
+        let analytics = null;
 
         try {
             if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey.trim() !== "") {
-                const app = initializeApp(firebaseConfig);
+                app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+                isSupported().then(supported => {
+                    if (supported) {
+                        analytics = getAnalytics(app);
+                    }
+                }).catch(() => { });
             }
         } catch (e) {
             console.error("Firebase Initialization Failed:", e);
@@ -1291,8 +1300,8 @@
             }
 
             try {
-                const blessingsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'blessings');
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'blessings', docId);
+                const blessingsCollection = collection(db, appId, appId, 'blessings');
+                const docRef = doc(db, appId, appId, 'blessings', docId);
                 await deleteDoc(docRef);
                 console.log("Cloud message deleted successfully:", docId);
                 alertCustom("已成功永久刪除雲端祝福！");
@@ -1504,7 +1513,7 @@
             // 💡 實時同步至 Firebase 雲端清屏
             if (db && currentUser) {
                 try {
-                    const controlDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'control');
+                    const controlDocRef = doc(db, appId, appId, 'config', 'control');
                     await setDoc(controlDocRef, { clearTrigger: Date.now() }, { merge: true });
                 } catch (e) {
                     console.error("Sync clear screen to Cloud failed:", e);
@@ -1742,8 +1751,8 @@
         function setupCloudSync() {
             if (!db || !currentUser) return;
 
-            // 💡 實時祝福監聽： artifacts/{appId}/public/data/blessings
-            const blessingsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'blessings');
+            // 💡 實時祝福監聽： icebubble/icebubble/blessings
+            const blessingsCollection = collection(db, appId, appId, 'blessings');
 
             if (unsubscribeBlessings) unsubscribeBlessings();
             unsubscribeBlessings = onSnapshot(blessingsCollection, (snapshot) => {
@@ -1786,8 +1795,8 @@
                 console.error("Firestore Blessings snapshot failed:", error);
             });
 
-            // 💡 實時控制訊號監聽： artifacts/{appId}/public/data/config/control
-            const controlDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'control');
+            // 💡 實時控制訊號監聽： icebubble/icebubble/config/control
+            const controlDocRef = doc(db, appId, appId, 'config', 'control');
 
             if (unsubscribeControl) unsubscribeControl();
             unsubscribeControl = onSnapshot(controlDocRef, (docSnap) => {
@@ -1816,7 +1825,7 @@
             }
 
             try {
-                const blessingsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'blessings');
+                const blessingsCollection = collection(db, appId, appId, 'blessings');
                 await addDoc(blessingsCollection, {
                     name: guestName,
                     text: guestText,
