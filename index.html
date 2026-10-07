@@ -1292,8 +1292,16 @@
 
         // 💡 雲端即時刪除函數
         async function deleteBlessingFromCloud(docId, name, text) {
-            if (!db || !currentUser) {
+            if (!docId) {
                 // 本地離線模式刪除
+                realMessageDatabase = realMessageDatabase.filter(m => m.name !== name || m.text !== text);
+                updateAdminAndSandboxTable();
+                updateAdminAndSandboxCounters();
+                removeDanmakuFromScreen(name, text);
+                return;
+            }
+
+            if (!db) {
                 realMessageDatabase = realMessageDatabase.filter(m => m.docId !== docId);
                 updateAdminAndSandboxTable();
                 updateAdminAndSandboxCounters();
@@ -1302,14 +1310,18 @@
             }
 
             try {
-                const blessingsCollection = collection(db, 'icebubble', appId, 'blessings');
                 const docRef = doc(db, 'icebubble', appId, 'blessings', docId);
                 await deleteDoc(docRef);
                 console.log("Cloud message deleted successfully:", docId);
+                // 本機狀態同步更新
+                realMessageDatabase = realMessageDatabase.filter(m => m.docId !== docId);
+                updateAdminAndSandboxTable();
+                updateAdminAndSandboxCounters();
+                removeDanmakuFromScreen(name, text);
                 alertCustom("已成功永久刪除雲端祝福！");
             } catch (error) {
                 console.error("Firestore Delete Failed:", error);
-                alertCustom("刪除失敗，請重試！");
+                alertCustom(`刪除失敗: ${error.code || error.message || '請確認權限'}`);
             }
         }
 
@@ -1511,17 +1523,16 @@
         // 清空所有大螢幕彈幕
         async function clearAllScreenDanmakus() {
             performClearScreen();
+            sysChannel.postMessage({ type: 'CLEAR_ALL_SCREEN' });
 
             // 💡 實時同步至 Firebase 雲端清屏
-            if (db && currentUser) {
+            if (db) {
                 try {
                     const controlDocRef = doc(db, 'icebubble', appId, 'config', 'control');
                     await setDoc(controlDocRef, { clearTrigger: Date.now() }, { merge: true });
                 } catch (e) {
                     console.error("Sync clear screen to Cloud failed:", e);
                 }
-            } else {
-                sysChannel.postMessage({ type: 'CLEAR_ALL_SCREEN' });
             }
         }
 
