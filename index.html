@@ -1256,6 +1256,44 @@
         }
 
         // ==========================================
+        // 已播放彈幕歷史防重複機制 (儲存於 localStorage，重新整理大螢幕時不重複播放)
+        // ==========================================
+        const DISPLAYED_DANMAKU_KEY = 'icebubble_displayed_danmakus';
+
+        function getDisplayedDanmakuMap() {
+            try {
+                const raw = localStorage.getItem(DISPLAYED_DANMAKU_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function isDanmakuAlreadyDisplayed(docId, timestamp, name, text) {
+            const map = getDisplayedDanmakuMap();
+            if (docId && map[`id_${docId}`]) return true;
+            const hashKey = `hash_${btoa(encodeURIComponent(`${name}_${text}_${timestamp}`)).replace(/[^a-zA-Z0-9]/g, '')}`;
+            if (map[hashKey]) return true;
+            return false;
+        }
+
+        function markDanmakuAsDisplayed(docId, timestamp, name, text) {
+            try {
+                const map = getDisplayedDanmakuMap();
+                if (docId) map[`id_${docId}`] = Date.now();
+                const hashKey = `hash_${btoa(encodeURIComponent(`${name}_${text}_${timestamp}`)).replace(/[^a-zA-Z0-9]/g, '')}`;
+                map[hashKey] = Date.now();
+
+                // 維護最多 1500 筆，防止存儲過大
+                const keys = Object.keys(map);
+                if (keys.length > 1500) {
+                    keys.slice(0, keys.length - 1200).forEach(k => delete map[k]);
+                }
+                localStorage.setItem(DISPLAYED_DANMAKU_KEY, JSON.stringify(map));
+            } catch (e) { }
+        }
+
+        // ==========================================
         // 4. 新彈幕中介分發機制
         // ==========================================
         function receiveNewDanmaku(name, text, isFromLocalInput = false, timestamp = Date.now(), docId = null) {
@@ -1272,6 +1310,9 @@
             const isMock = name.startsWith("🤖 ") || MOCK_PRESET_MESSAGES.some(m => m.name === name);
 
             if (!isMock) {
+                // 標記為已播放，防止重複顯示
+                markDanmakuAsDisplayed(docId, timestamp, name, text);
+
                 // 💡 修復：將原本拋出 ReferenceError 的 msg 修正為區域變數 name，保證成功寫入資料庫
                 const exists = realMessageDatabase.some(m => m.timestamp === timestamp && m.name === name);
                 if (!exists) {
@@ -1447,14 +1488,27 @@
         // 6.  主辦方控制台邏輯與 CSV 重播數據整合
         // ==========================================
         async function toggleMockBot(checked) {
-            isMockBotEnabled = checked;
+            isMockBotEnabled = Boolean(checked);
             // 廣播給其他視窗
             sysChannel.postMessage({
                 type: 'MOCK_BOT_STATE_CHANGE',
-                enabled: checked
+                enabled: isMockBotEnabled
             });
             updateAdminAndSandboxControls();
             resetMockBotTimer(); // 💡 廣播開關本地必須同步執行，徹底重設定時器
+
+            // 💡 實時同步至 Firebase: icebubble/{appId}/config/control/autosendbubble
+            if (db) {
+                try {
+                    const controlDocRef = doc(db, 'icebubble', appId, 'config', 'control');
+                    await setDoc(controlDocRef, {
+                        autosendbubble: isMockBotEnabled
+                    }, { merge: true });
+                    console.log("Synced autosendbubble to Cloud:", isMockBotEnabled);
+                } catch (e) {
+                    console.error("Sync autosendbubble to Cloud failed:", e);
+                }
+            }
         }
 
         function updateAdminAndSandboxControls() {
@@ -1804,12 +1858,27 @@
                 updateAdminAndSandboxTable();
                 updateAdminAndSandboxCounters();
 
-                // 依序派發排隊彈幕
+                // 依序派發排隊彈幕 (大螢幕排隊輪播)
                 incoming.sort((a, b) => a.timestamp - b.timestamp);
                 incoming.forEach(msg => {
-                    // 若開著頁面收到即時新增一律派發；若剛開啟頁面，派發最近 10 分鐘內祝福
-                    const isRecent = msg.timestamp > (Date.now() - 10 * 60 * 1000);
-                    if (!isFirstBlessingsSnapshot || isRecent) {
+                    const alreadyShown = isDanmakuAlreadyDisplayed(msg.docId, msg.timestamp, msg.name, msg.text);
+
+                    if (isFirstBlessingsSnapshot) {
+                        // 💡 1. 重新整理滿版大螢幕投影時，不重複顯示已經顯示過的彈幕
+                        if (alreadyShown) {
+                            return;
+                        }
+                        // 若為頁面載入前就存在於雲端的歷史資料（超過 10 秒前），標記為已看過，不予在重新整理時重複噴射上牆
+                        const isJustArrived = msg.timestamp > (pageLoadTime - 10000);
+                        if (!isJustArrived) {
+                            markDanmakuAsDisplayed(msg.docId, msg.timestamp, msg.name, msg.text);
+                            return;
+                        }
+                    }
+
+                    // 正常即時彈幕派發流程
+                    if (!alreadyShown) {
+                        markDanmakuAsDisplayed(msg.docId, msg.timestamp, msg.name, msg.text);
                         receiveNewDanmaku(msg.name, msg.text, false, msg.timestamp, msg.docId);
                     }
                 });
@@ -1818,18 +1887,29 @@
                 console.error("Firestore Blessings snapshot failed:", error);
             });
 
-            // 💡 實時控制訊號監聽： icebubble/icebubble/config/control
+            // 💡 實時控制訊號監聽： icebubble/{appId}/config/control
             const controlDocRef = doc(db, 'icebubble', appId, 'config', 'control');
 
             if (unsubscribeControl) unsubscribeControl();
             unsubscribeControl = onSnapshot(controlDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if (typeof data.isMockBotEnabled !== 'undefined' && data.isMockBotEnabled !== isMockBotEnabled) {
-                        isMockBotEnabled = data.isMockBotEnabled;
+
+                    // 💡 2. 連結 Firebase 的 boolean 參數：autosendbubble (相容 isMockBotEnabled)
+                    let autoSendState;
+                    if (typeof data.autosendbubble !== 'undefined') {
+                        autoSendState = Boolean(data.autosendbubble);
+                    } else if (typeof data.isMockBotEnabled !== 'undefined') {
+                        autoSendState = Boolean(data.isMockBotEnabled);
+                    }
+
+                    if (typeof autoSendState !== 'undefined' && autoSendState !== isMockBotEnabled) {
+                        console.log("Firebase autosendbubble updated to:", autoSendState);
+                        isMockBotEnabled = autoSendState;
                         updateAdminAndSandboxControls();
                         resetMockBotTimer();
                     }
+
                     if (data.clearTrigger && data.clearTrigger > lastClearTrigger) {
                         lastClearTrigger = data.clearTrigger;
                         performClearScreen();
