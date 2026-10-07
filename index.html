@@ -1300,8 +1300,8 @@
             }
 
             try {
-                const blessingsCollection = collection(db, appId, appId, 'blessings');
-                const docRef = doc(db, appId, appId, 'blessings', docId);
+                const blessingsCollection = collection(db, 'icebubble', appId, 'blessings');
+                const docRef = doc(db, 'icebubble', appId, 'blessings', docId);
                 await deleteDoc(docRef);
                 console.log("Cloud message deleted successfully:", docId);
                 alertCustom("已成功永久刪除雲端祝福！");
@@ -1513,7 +1513,7 @@
             // 💡 實時同步至 Firebase 雲端清屏
             if (db && currentUser) {
                 try {
-                    const controlDocRef = doc(db, appId, appId, 'config', 'control');
+                    const controlDocRef = doc(db, 'icebubble', appId, 'config', 'control');
                     await setDoc(controlDocRef, { clearTrigger: Date.now() }, { merge: true });
                 } catch (e) {
                     console.error("Sync clear screen to Cloud failed:", e);
@@ -1755,7 +1755,7 @@
             if (!db) return;
 
             // 💡 實時祝福監聽： icebubble/icebubble/blessings
-            const blessingsCollection = collection(db, appId, appId, 'blessings');
+            const blessingsCollection = collection(db, 'icebubble', appId, 'blessings');
 
             if (unsubscribeBlessings) unsubscribeBlessings();
             unsubscribeBlessings = onSnapshot(blessingsCollection, (snapshot) => {
@@ -1802,7 +1802,7 @@
             });
 
             // 💡 實時控制訊號監聽： icebubble/icebubble/config/control
-            const controlDocRef = doc(db, appId, appId, 'config', 'control');
+            const controlDocRef = doc(db, 'icebubble', appId, 'config', 'control');
 
             if (unsubscribeControl) unsubscribeControl();
             unsubscribeControl = onSnapshot(controlDocRef, (docSnap) => {
@@ -1839,7 +1839,7 @@
             }
 
             try {
-                const blessingsCollection = collection(db, appId, appId, 'blessings');
+                const blessingsCollection = collection(db, 'icebubble', appId, 'blessings');
                 await addDoc(blessingsCollection, {
                     name: guestName,
                     text: guestText,
