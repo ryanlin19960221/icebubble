@@ -1010,6 +1010,8 @@
             } else if (viewName === 'admin') {
                 document.getElementById('view-admin').classList.remove('hidden');
                 updateAdminAndSandboxControls();
+                updateAdminAndSandboxTable();
+                updateAdminAndSandboxCounters();
             } else if (viewName === 'sandbox') {
                 document.getElementById('view-sandbox').classList.remove('hidden');
                 // 將大螢幕渲染容器移至 sandobx 視區
@@ -1765,10 +1767,14 @@
                     const docId = change.doc.id;
 
                     if (change.type === "added") {
-                        const exists = realMessageDatabase.some(m => m.timestamp === docData.timestamp && m.name === docData.name);
+                        if (!docData || typeof docData.name !== 'string' || typeof docData.text !== 'string') {
+                            return;
+                        }
+                        const timestamp = docData.timestamp ? Number(docData.timestamp) : Date.now();
+                        const exists = realMessageDatabase.some(m => m.docId === docId || (m.timestamp === timestamp && m.name === docData.name));
                         if (!exists) {
                             // 儲存 docId，這樣點擊刪除按鈕時才能正確從 Firebase 抹除數據
-                            const msgWithId = { ...docData, docId: docId };
+                            const msgWithId = { ...docData, timestamp: timestamp, docId: docId };
                             realMessageDatabase.push(msgWithId);
                             incoming.push(msgWithId);
                         }
@@ -1858,6 +1864,7 @@
         // 11. 輔助工具與安全防禦
         // ==========================================
         function escapeHTML(str) {
+            if (!str || typeof str !== 'string') return '';
             return str
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -1883,19 +1890,31 @@
         // 監聽認證狀態，認證成功後安全訂閱即時雲端數據
         if (auth) {
             onAuthStateChanged(auth, (user) => {
+                const uidDisplay = document.getElementById('user-uid-display');
                 if (user) {
                     currentUser = user;
                     console.log("Firebase Auth Verified. UID:", user.uid);
 
-                    const uidDisplay = document.getElementById('user-uid-display');
-                    if (uidDisplay) uidDisplay.innerText = user.uid;
+                    if (uidDisplay) {
+                        uidDisplay.innerText = user.uid;
+                        uidDisplay.className = "text-emerald-600 font-bold font-mono";
+                    }
                 } else {
                     currentUser = null;
+                    if (uidDisplay) {
+                        uidDisplay.innerText = "ONLINE (PUBLIC_MODE)";
+                        uidDisplay.className = "text-emerald-600 font-bold font-mono";
+                    }
                 }
                 setupCloudSync();
             });
             initFirebaseAuthentication();
         } else if (db) {
+            const uidDisplay = document.getElementById('user-uid-display');
+            if (uidDisplay) {
+                uidDisplay.innerText = "ONLINE (DB_ONLY)";
+                uidDisplay.className = "text-emerald-600 font-bold font-mono";
+            }
             setupCloudSync();
         }
 
