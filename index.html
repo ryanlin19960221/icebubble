@@ -882,7 +882,7 @@
             measurementId: "G-TKB8FQX60B"
         };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wedding-e0b40';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'icebubble';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // 初始化服務 (具備健全的 fallback 防呆)
@@ -1734,6 +1734,7 @@
         let unsubscribeControl = null;
         let lastClearTrigger = 0;
         const pageLoadTime = Date.now();
+        let isFirstBlessingsSnapshot = true;
 
         async function initFirebaseAuthentication() {
             if (!auth) return;
@@ -1744,12 +1745,14 @@
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                console.error("Firebase Authentication Failed:", error);
+                console.warn("Firebase Authentication Notice:", error);
+                // 即使匿名登入未開啟，仍嘗試啟動 setupCloudSync
+                setupCloudSync();
             }
         }
 
         function setupCloudSync() {
-            if (!db || !currentUser) return;
+            if (!db) return;
 
             // 💡 實時祝福監聽： icebubble/icebubble/blessings
             const blessingsCollection = collection(db, appId, appId, 'blessings');
@@ -1784,13 +1787,16 @@
                 updateAdminAndSandboxTable();
                 updateAdminAndSandboxCounters();
 
-                // 依序派發排隊彈幕 (僅派發頁面開啟後產生的即時祝福)
+                // 依序派發排隊彈幕
                 incoming.sort((a, b) => a.timestamp - b.timestamp);
                 incoming.forEach(msg => {
-                    if (msg.timestamp > pageLoadTime - 2000) {
+                    // 若開著頁面收到即時新增一律派發；若剛開啟頁面，派發最近 10 分鐘內祝福
+                    const isRecent = msg.timestamp > (Date.now() - 10 * 60 * 1000);
+                    if (!isFirstBlessingsSnapshot || isRecent) {
                         receiveNewDanmaku(msg.name, msg.text, false, msg.timestamp, msg.docId);
                     }
                 });
+                isFirstBlessingsSnapshot = false;
             }, (error) => {
                 console.error("Firestore Blessings snapshot failed:", error);
             });
@@ -1819,7 +1825,15 @@
 
         // 寫入即時祝福至 Cloud Firestore (公用路徑保護)
         async function writeBlessingToCloud(guestName, guestText) {
-            if (!db || !currentUser) {
+            // 同步廣播給同一瀏覽器的其他分頁（本機雙分頁測試即刻聯動）
+            sysChannel.postMessage({
+                type: 'SEND_DANMAKU',
+                name: guestName,
+                text: guestText,
+                timestamp: Date.now()
+            });
+
+            if (!db) {
                 receiveNewDanmaku(guestName, guestText, false);
                 return;
             }
@@ -1830,12 +1844,13 @@
                     name: guestName,
                     text: guestText,
                     timestamp: Date.now(),
-                    senderUid: currentUser.uid
+                    senderUid: currentUser ? currentUser.uid : 'guest'
                 });
                 console.log("Cloud Write Successfully!");
             } catch (error) {
                 console.error("Firestore Write Blessing Failed:", error);
-                alertCustom("雲端發送失敗，請重試！");
+                alertCustom(`雲端發送失敗: ${error.code || error.message || '請確認權限'}`);
+                receiveNewDanmaku(guestName, guestText, false);
             }
         }
 
@@ -1874,13 +1889,14 @@
 
                     const uidDisplay = document.getElementById('user-uid-display');
                     if (uidDisplay) uidDisplay.innerText = user.uid;
-
-                    setupCloudSync();
                 } else {
                     currentUser = null;
                 }
+                setupCloudSync();
             });
             initFirebaseAuthentication();
+        } else if (db) {
+            setupCloudSync();
         }
 
         // 💡 應用程式初始化進入點 (防範 window.onload 提早觸發或失效)
