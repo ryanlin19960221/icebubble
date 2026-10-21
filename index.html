@@ -65,11 +65,11 @@
             content: '';
             position: absolute;
             top: 0;
-            left: -8px;
+            left: -10px;
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 0 8px 10px 0;
+            border-width: 0 10px 12px 0;
             border-color: transparent transparent transparent transparent;
         }
 
@@ -126,12 +126,12 @@
 
 
         .responsive-name {
-            font-size: clamp(11px, 0.95vw, 18px);
+            font-size: clamp(14px, 1.25vw, 24px);
         }
 
         .responsive-text {
-            font-size: clamp(13px, 1.35vw, 24px);
-            line-height: 1.35;
+            font-size: clamp(18px, 2.1vw, 36px);
+            line-height: 1.4;
         }
 
         .cyber-grid-bg {
@@ -463,12 +463,12 @@
 
         <!-- 上半部彈幕專屬區 -->
         <div id="danmaku-area"
-            class="absolute top-0 left-0 right-0 h-[40%] pointer-events-none z-30 select-none overflow-hidden">
+            class="absolute top-0 left-0 right-0 h-[44%] pointer-events-none z-30 select-none overflow-hidden">
             <!-- 實體三軌道柔性排版網格系統 -->
             <div class="flex flex-col justify-around h-full w-full py-1" id="tracks-container">
-                <div class="relative w-full h-[28%] overflow-visible" id="track-row-0"></div>
-                <div class="relative w-full h-[28%] overflow-visible" id="track-row-1"></div>
-                <div class="relative w-full h-[28%] overflow-visible" id="track-row-2"></div>
+                <div class="relative w-full h-[30%] overflow-visible" id="track-row-0"></div>
+                <div class="relative w-full h-[30%] overflow-visible" id="track-row-1"></div>
+                <div class="relative w-full h-[30%] overflow-visible" id="track-row-2"></div>
             </div>
         </div>
 
@@ -1382,13 +1382,13 @@
             // 清理名字和內容，移除機器人前綴符號
             const cleanName = name.replace(/^🤖\s*/, '');
 
-            //  內裝排版採用縮小優化後的字型與緊湊Padding，加上 whitespace-nowrap 預防名字太長折行爆出軌道
+            //  內裝排版採用清晰大字型與最適Padding，加上 whitespace-nowrap 預防名字太長折行爆出軌道
             bubbleContainer.innerHTML = `
-                <span class="responsive-name font-black text-slate-100 px-2.5 py-1 mb-1.5 rounded-lg bg-black/50 backdrop-blur-md shadow-sm border border-white/10 tracking-wide whitespace-nowrap">
+                <span class="responsive-name font-black text-slate-100 px-3 py-1 mb-1.5 rounded-lg bg-black/60 backdrop-blur-md shadow-sm border border-white/15 tracking-wide whitespace-nowrap">
                     ${escapeHTML(cleanName)}
                 </span>
-                <div class="chat-bubble px-4 py-2.5 rounded-2xl rounded-tl-none shadow-xl max-w-[280px] sm:max-w-[380px] md:max-w-[480px] lg:max-w-[600px] relative ${randomColorClass}">
-                    <div class="responsive-text font-semibold break-words">${escapeHTML(text)}</div>
+                <div class="chat-bubble px-5 py-3 rounded-2xl rounded-tl-none shadow-xl max-w-[320px] sm:max-w-[440px] md:max-w-[580px] lg:max-w-[760px] xl:max-w-[900px] relative ${randomColorClass}">
+                    <div class="responsive-text font-bold break-words">${escapeHTML(text)}</div>
                 </div>
             `;
 
