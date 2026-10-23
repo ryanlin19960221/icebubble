@@ -140,10 +140,23 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-6px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(6px);
+            }
         }
+
         .animate-shake {
             animation: shake 0.4s ease-in-out;
         }
@@ -236,7 +249,8 @@
                 <div class="flex items-center justify-center gap-2 mb-3 md:mb-3">
                     <div
                         class="inline-flex items-center gap-2 px-3.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-none text-[10px] font-mono text-orange-600 tracking-widest uppercase shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.1 //
+                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> TERMINAL MONITOR v2.1
+                        //
                         CLOUD-DELETE
                     </div>
                     <button onclick="lockHub()"
@@ -248,194 +262,202 @@
                 <h1 class="text-3xl md:text-4xl font-black tracking-wider text-[#1c1917] mb-2 md:mb-2 uppercase">
                     彈幕泡泡 <span class="text-orange-600">+</span> 照片輪播
                 </h1>
-                <p class="text-[#78716c] text-xs md:text-sm font-semibold tracking-wider max-w-lg mx-auto leading-relaxed">
+                <p
+                    class="text-[#78716c] text-xs md:text-sm font-semibold tracking-wider max-w-lg mx-auto leading-relaxed">
                     極致滿版大螢幕投影，配備多軌道物理防撞對話彈幕引擎。點擊並使用新分頁啟動對應操控模組。
                 </p>
             </div>
 
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 max-w-4xl md:max-w-3xl w-full relative z-10 mb-4">
-            <!-- 3合1開發模式 -->
-            <a href="?view=sandbox" target="_blank"
-                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-
-                <div
-                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ SYSTEM
-                            // SANDBOX ]</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
-                        <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 整合模擬器
-                    </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">
-                        在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用。</p>
-                </div>
-                <div
-                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    BOOT SANDBOX <i
-                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- 大螢幕主頁面 -->
-            <a href="?view=screen" target="_blank"
-                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-
-                <div
-                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ DISPLAY
-                            // SCREEN ]</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
-                    </div>
-                    <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
-                        <i class="fa-solid fa-desktop text-sm text-orange-600"></i> 滿版大螢幕投影視圖
-                    </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">活動投影布幕或電視牆專用，100%
-                        滿版無干擾。支援事後加上重播網址參數，本機匯入 CSV 重播當天彈幕。</p>
-                </div>
-                <div
-                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    DEPLOY DISPLAY <i
-                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- 手機賓客發送端 -->
-            <a href="?view=mobile" target="_blank"
-                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-
-                <div
-                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 tracking-wider">[ TERMINAL // CLIENT ]</span>
-                        <span class="flex items-center gap-1.5 text-[10px] text-orange-600 font-mono">
-                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span> ONLINE_TERMINAL
-                        </span>
-                    </div>
-                    <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
-                        <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
-                    </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage
-                        記憶姓名並支援隨時修改。</p>
-                </div>
-                <div
-                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    LAUNCH CLIENT <i
-                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- 獨立主辦方控制台 -->
-            <a href="?view=admin" target="_blank"
-                class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
-
-                <div
-                    class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-                <div
-                    class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[ ADMIN
-                            // CONSOLE ]</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
-                    </div>
-                    <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-sm text-orange-600"></i> 主辦人控制台頁面
-                    </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">
-                        現場管理人員獨立頁面。可於不干擾投影的前提下即時監控留言、切換定時暖場、並打包儲存 CSV 歷史紀錄。</p>
-                </div>
-                <div
-                    class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
-                    OPEN CONSOLE <i
-                        class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- 新增入口：時光重溫祝福回放卡片 (Replay Module) -->
             <div
-                class="md:col-span-2 group relative flex flex-col justify-between p-6 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl">
+                class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4 max-w-4xl md:max-w-3xl w-full relative z-10 mb-4">
+                <!-- 3合1開發模式 -->
+                <a href="?view=sandbox" target="_blank"
+                    class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
 
-                <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-red-500/40"></div>
-                <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-red-500/40"></div>
-                <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-red-500/40"></div>
-                <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-red-500/40"></div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY //
-                            CSV_LOADER ]</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+                    <div
+                        class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
                     </div>
-                    <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
-                        <i class="fa-solid fa-history text-sm text-red-600"></i> 溫馨回溯與歷史祝福回放
-                    </h3>
-                    <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV
-                        祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
-                </div>
-                <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                    <input type="file" id="hub-csv-import" accept=".csv" class="hidden"
-                        onchange="handleHubCSVImport(event)">
-                    <button onclick="document.getElementById('hub-csv-import').click()"
-                        class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-mono font-bold py-3 px-6 text-xs uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-import"></i> 載入並重播祝福 (.CSV)
-                    </button>
-                    <span class="text-[9px] text-stone-400 font-mono font-bold">SUPPORT UTF-8 EXCEL CSV</span>
+                    <div
+                        class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[
+                                SYSTEM
+                                // SANDBOX ]</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                            <i class="fa-solid fa-flask text-sm text-orange-600"></i> 3合1 整合模擬器
+                        </h3>
+                        <p class="text-xs text-stone-500 leading-relaxed font-medium">
+                            在一頁空間中模擬大螢幕投影、賓客發言端、管理後台三大角色，全功能單頁調試專用。</p>
+                    </div>
+                    <div
+                        class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                        BOOT SANDBOX <i
+                            class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <!-- 大螢幕主頁面 -->
+                <a href="?view=screen" target="_blank"
+                    class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                    <div
+                        class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[
+                                DISPLAY
+                                // SCREEN ]</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                        </div>
+                        <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                            <i class="fa-solid fa-desktop text-sm text-orange-600"></i> 滿版大螢幕投影視圖
+                        </h3>
+                        <p class="text-xs text-stone-500 leading-relaxed font-medium">活動投影布幕或電視牆專用，100%
+                            滿版無干擾。支援事後加上重播網址參數，本機匯入 CSV 重播當天彈幕。</p>
+                    </div>
+                    <div
+                        class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                        DEPLOY DISPLAY <i
+                            class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <!-- 手機賓客發送端 -->
+                <a href="?view=mobile" target="_blank"
+                    class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                    <div
+                        class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] font-mono text-orange-600 tracking-wider">[ TERMINAL // CLIENT
+                                ]</span>
+                            <span class="flex items-center gap-1.5 text-[10px] text-orange-600 font-mono">
+                                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                                ONLINE_TERMINAL
+                            </span>
+                        </div>
+                        <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                            <i class="fa-solid fa-mobile-screen-button text-sm text-orange-600"></i> 賓客手機發送端
+                        </h3>
+                        <p class="text-xs text-stone-500 leading-relaxed font-medium">免安裝註冊，掃碼即用。自動 LocalStorage
+                            記憶姓名並支援隨時修改。</p>
+                    </div>
+                    <div
+                        class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                        LAUNCH CLIENT <i
+                            class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <!-- 獨立主辦方控制台 -->
+                <a href="?view=admin" target="_blank"
+                    class="group relative flex flex-col justify-between p-5 md:p-5 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl h-full">
+
+                    <div
+                        class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+                    <div
+                        class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-orange-500/20 group-hover:border-orange-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] font-mono text-orange-600 font-bold uppercase tracking-wider">[
+                                ADMIN
+                                // CONSOLE ]</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                        </div>
+                        <h3 class="text-base md:text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-sm text-orange-600"></i> 主辦人控制台頁面
+                        </h3>
+                        <p class="text-xs text-stone-500 leading-relaxed font-medium">
+                            現場管理人員獨立頁面。可於不干擾投影的前提下即時監控留言、切換定時暖場、並打包儲存 CSV 歷史紀錄。</p>
+                    </div>
+                    <div
+                        class="mt-6 flex items-center text-orange-600 group-hover:text-orange-700 text-xs font-mono font-bold tracking-wider uppercase">
+                        OPEN CONSOLE <i
+                            class="fa-solid fa-chevron-right ml-1.5 text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </a>
+
+                <!-- 新增入口：時光重溫祝福回放卡片 (Replay Module) -->
+                <div
+                    class="md:col-span-2 group relative flex flex-col justify-between p-6 bg-white hover:bg-stone-50 border border-stone-300 hover:border-orange-500 transition duration-300 text-left overflow-hidden shadow-md hover:shadow-xl">
+
+                    <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-red-500/40"></div>
+                    <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-red-500/40"></div>
+                    <div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-red-500/40"></div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-red-500/40"></div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[10px] font-mono text-red-600 font-bold uppercase tracking-wider">[ REPLAY
+                                //
+                                CSV_LOADER ]</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-[#1c1917] flex items-center gap-2">
+                            <i class="fa-solid fa-history text-sm text-red-600"></i> 溫馨回溯與歷史祝福回放
+                        </h3>
+                        <p class="text-xs text-stone-500 leading-relaxed font-medium">匯入先前下載與修改錯字後的 CSV
+                            祝福紀錄，定速在滿版大螢幕投影頁面上重溫全場的熱絡與感動。</p>
+                    </div>
+                    <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <input type="file" id="hub-csv-import" accept=".csv" class="hidden"
+                            onchange="handleHubCSVImport(event)">
+                        <button onclick="document.getElementById('hub-csv-import').click()"
+                            class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-mono font-bold py-3 px-6 text-xs uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-import"></i> 載入並重播祝福 (.CSV)
+                        </button>
+                        <span class="text-[9px] text-stone-400 font-mono font-bold">SUPPORT UTF-8 EXCEL CSV</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="mt-4 text-[10px] text-stone-500 font-mono tracking-wider text-center relative z-10">
-            SYSTEM ENGINE BROADCAST ONLINE // MULTI-TAB REALTIME SYNCHRONIZED ENABLED
-        </div>
+            <div class="mt-4 text-[10px] text-stone-500 font-mono tracking-wider text-center relative z-10">
+                SYSTEM ENGINE BROADCAST ONLINE // MULTI-TAB REALTIME SYNCHRONIZED ENABLED
+            </div>
         </div>
     </div>
 
@@ -1005,16 +1027,16 @@
 
         // 模擬自動發言 (暖場) 的趣味詞庫
         const MOCK_PRESET_MESSAGES = [
-            { name: "小明", text: "這張照片也太美了吧！❤️" },
-            { name: "阿輝", text: "新婚快樂！恭喜恭喜 🎉🎉" },
-            { name: "雅婷", text: "天啊，新娘這套白紗簡真仙女下凡 😍" },
-            { name: "冠宇", text: "祝福你們白頭偕老，永浴愛河！✨" },
-            { name: "Allen", text: "菜色看起來好高級，肚子超餓！" },
-            { name: "佳豪", text: "新郎今天也太帥了吧！👍" },
-            { name: "萱萱", text: "恭喜加入幸福人夫陣營 😂" },
-            { name: "美惠", text: "等一下大家有要一起大合照嗎？📷" },
-            { name: "俊傑", text: "希望今天我可以抽到最大獎 🎁" },
-            { name: "淑芬", text: "顏值太逆天了吧 🔥" }
+            { name: "MinMin", text: "這張照片也太美了吧！❤️" },
+            { name: "Justin", text: "新婚快樂！恭喜恭喜 🎉🎉" },
+            { name: "Jane", text: "天啊，新娘簡直仙女下凡 😍" },
+            { name: "Jason", text: "祝福你們白頭偕老，永浴愛河！✨" },
+            { name: "Allen", text: "菜單好有創意！" },
+            { name: "Larry", text: "新郎今天也太帥了吧！👍" },
+            { name: "Amy", text: "恭喜加入幸福人夫陣營 😂" },
+            { name: "Grace", text: "這個彈幕功能是宜雯寫的？太強了" },
+            { name: "Jack", text: "今天的婚禮驚喜好多 🎁" },
+            { name: "Coco", text: "顏值太逆天了吧 🔥" }
         ];
 
         // 馬卡龍氣泡樣式 class 名稱
