@@ -994,12 +994,12 @@
         // ==========================================
         // 照片清單與模糊背景
         // ==========================================
-        const TOTAL_PHOTOS = 185; // 💡 總共有 185 張照片，自動輪播 01.webp ~ 185.webp
+        const TOTAL_PHOTOS = 232; // 💡 總共有 232 張照片，自動輪播 001.webp ~ 232.webp
         const PHOTO_PREFIX = "img/"; // 照片放在 img 資料夾
 
         const PRESET_PHOTOS = Array.from({ length: TOTAL_PHOTOS }, (_, i) => {
-            // 自動補零補足兩位數（例如 1 變成 01，9 變成 09，12 保持 12）
-            const fileNumber = String(i + 1).padStart(2, '0');
+            // 自動補零補足三位數（例如 1 變成 001，12 變成 012，120 保持 120）
+            const fileNumber = String(i + 1).padStart(3, '0');
             return `${PHOTO_PREFIX}${fileNumber}.webp`;
         });
 
