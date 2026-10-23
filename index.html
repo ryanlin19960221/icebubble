@@ -692,7 +692,7 @@
                     <div class="bg-stone-50 p-4 border border-stone-200 flex items-center justify-between">
                         <div>
                             <span class="text-xs font-mono font-black block text-stone-800"> WARMUP_MOCK_BOT</span>
-                            <span class="text-[10px] text-stone-500 font-semibold">當無人留言時，機器人會定時補位</span>
+                            <span class="text-[10px] text-stone-500 font-semibold">若連續 10 秒無人發言，自動送上詞庫暖場</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="mock-switch" class="sr-only peer" checked
@@ -856,7 +856,7 @@
 
                         <div>
                             <span class="text-xs font-mono font-black block text-stone-800">WARMUP_MOCK_BOT</span>
-                            <span class="text-[9px] text-stone-500 font-semibold">大螢幕空置時自動送上隨機詞庫</span>
+                            <span class="text-[9px] text-stone-500 font-semibold">若連續 10 秒無人發言，自動送上詞庫暖場</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="sb-mock-switch" class="sr-only peer" checked
@@ -1063,8 +1063,16 @@
         let activeDanmakusList = []; // 正在畫面上運作的彈幕實體物件 list
         let animationFrameId = null;
 
-        // 智能發送隨機計時器
+        // 智能發送隨機計時器與暖場設定
         let mockBotTimer = null;
+        const MOCK_IDLE_DELAY_MS = 10000; // 💡 若連續 10 秒無人發言，再自動發送
+        let lastMockIndex = -1;
+
+        // 賓客發送冷卻限制
+        const GUEST_SEND_COOLDOWN_MS = 2000; // 💡 賓客發送彈幕後 2 秒才可再次發送
+        let lastGuestSendTimestamp = 0;
+        let lastSandboxSendTimestamp = 0;
+        let cooldownTimer = null;
 
         // 跨視窗/分頁實時連動 BroadcastChannel (當使用者多視窗操作時)
         const sysChannel = new BroadcastChannel('danmaku_system_sync');
@@ -1491,6 +1499,8 @@
 
             // 💡 若為本地端用戶自主輸入，即刻推送至實體 Firebase 雲端資料庫！
             if (isFromLocalInput) {
+                // 本地自主輸入，重設無人發言計時器
+                resetMockBotTimer();
                 writeBlessingToCloud(name, text);
                 return;
             }
@@ -1514,6 +1524,9 @@
                     });
                 }
                 updateAdminAndSandboxTable();
+
+                // 💡 真人賓客發言，重設 10 秒無人發言計時器
+                resetMockBotTimer();
             } else {
                 totalMockSentCount++;
             }
@@ -1610,6 +1623,14 @@
 
         // 手機端發送
         function sendDanmaku() {
+            const now = Date.now();
+            const elapsed = now - lastGuestSendTimestamp;
+            if (elapsed < GUEST_SEND_COOLDOWN_MS) {
+                const remainSec = ((GUEST_SEND_COOLDOWN_MS - elapsed) / 1000).toFixed(1);
+                alertCustom(`發送太快囉！請等待 ${remainSec} 秒後再發送`);
+                return;
+            }
+
             const nameInput = document.getElementById('guest-name');
             const msgInput = document.getElementById('guest-message');
             const sendBtn = document.getElementById('send-btn');
@@ -1632,6 +1653,9 @@
                 return;
             }
 
+            // 記錄本次發送時間，啟動 2 秒冷卻鎖定
+            lastGuestSendTimestamp = Date.now();
+
             // 分發彈幕
             receiveNewDanmaku(name, message, true);
 
@@ -1639,18 +1663,46 @@
             const charCount = document.getElementById('char-count');
             if (charCount) charCount.innerText = "0/40";
 
-            // 發送按鈕動畫回饋
-            sendBtn.disabled = true;
+            // 發送按鈕動畫回饋與 2 秒冷卻倒數
+            const originalBtnHTML = `<i class="fa-solid fa-paper-plane"></i> 一鍵送出現場祝福`;
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                sendBtn.classList.remove('active:scale-95');
+                sendBtn.innerHTML = `<i class="fa-solid fa-clock"></i> 已送出！稍候 (2s)...`;
+            }
             if (successTip) successTip.classList.remove('hidden');
 
-            setTimeout(() => {
-                sendBtn.disabled = false;
-                if (successTip) successTip.classList.add('hidden');
-            }, 2500);
+            if (cooldownTimer) clearInterval(cooldownTimer);
+            let remainingSeconds = 2;
+            cooldownTimer = setInterval(() => {
+                remainingSeconds--;
+                if (remainingSeconds > 0) {
+                    if (sendBtn) sendBtn.innerHTML = `<i class="fa-solid fa-clock"></i> 已送出！稍候 (${remainingSeconds}s)...`;
+                } else {
+                    clearInterval(cooldownTimer);
+                    cooldownTimer = null;
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = originalBtnHTML;
+                        sendBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        sendBtn.classList.add('active:scale-95');
+                    }
+                    if (successTip) successTip.classList.add('hidden');
+                }
+            }, 1000);
         }
 
         // 沙盒手機端發送
         function sendSandboxDanmaku() {
+            const now = Date.now();
+            const elapsed = now - lastSandboxSendTimestamp;
+            if (elapsed < GUEST_SEND_COOLDOWN_MS) {
+                const remainSec = ((GUEST_SEND_COOLDOWN_MS - elapsed) / 1000).toFixed(1);
+                alertCustom(`沙盒測試發送冷卻中，請等待 ${remainSec} 秒後再發送！`);
+                return;
+            }
+
             const nameInput = document.getElementById('sb-guest-name');
             const msgInput = document.getElementById('sb-guest-message');
             const name = nameInput.value.trim();
@@ -1670,6 +1722,7 @@
                 return;
             }
 
+            lastSandboxSendTimestamp = Date.now();
             receiveNewDanmaku(name, message, true);
             msgInput.value = '';
         }
@@ -1789,6 +1842,7 @@
             activeDanmakusList = [];
             tracks = Array(NUM_TRACKS).fill(null);
             danmakuQueue = [];
+            resetMockBotTimer(); // 清空後重新倒數 10 秒
         }
 
         // ==========================================
@@ -1963,23 +2017,28 @@
         // 9. 🤖 智能暖場模擬人定時邏輯
         // ==========================================
         function resetMockBotTimer() {
-            if (mockBotTimer) clearTimeout(mockBotTimer);
+            if (mockBotTimer) {
+                clearTimeout(mockBotTimer);
+                mockBotTimer = null;
+            }
 
             if (!isMockBotEnabled) return;
 
-            const randomDelay = 8000 + Math.random() * 10000;
-
+            // 💡 若連續 10 秒無人發言，再自動發送 MOCK_PRESET_MESSAGES
             mockBotTimer = setTimeout(() => {
                 triggerMockMessage();
                 resetMockBotTimer();
-            }, randomDelay);
+            }, MOCK_IDLE_DELAY_MS);
         }
 
         function triggerMockMessage() {
+            // 若排隊隊列中仍有待發送的彈幕，代表現場尚在播放中，暫不插入模擬彈幕
             if (danmakuQueue.length > 0) return;
+            if (!MOCK_PRESET_MESSAGES || MOCK_PRESET_MESSAGES.length === 0) return;
 
-            const randomMsgIndex = Math.floor(Math.random() * MOCK_PRESET_MESSAGES.length);
-            const mockMsg = MOCK_PRESET_MESSAGES[randomMsgIndex];
+            // 依序輪播預設留言，避免連續重複
+            lastMockIndex = (lastMockIndex + 1) % MOCK_PRESET_MESSAGES.length;
+            const mockMsg = MOCK_PRESET_MESSAGES[lastMockIndex];
 
             receiveNewDanmaku(`🤖 ${mockMsg.name}`, mockMsg.text);
         }
