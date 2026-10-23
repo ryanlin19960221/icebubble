@@ -692,7 +692,7 @@
                     <div class="bg-stone-50 p-4 border border-stone-200 flex items-center justify-between">
                         <div>
                             <span class="text-xs font-mono font-black block text-stone-800"> WARMUP_MOCK_BOT</span>
-                            <span class="text-[10px] text-stone-500 font-semibold">若連續 10 秒無人發言，自動送上詞庫暖場</span>
+                            <span class="text-[10px] text-stone-500 font-semibold">若連續 30 秒無人發言，自動送上詞庫暖場</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="mock-switch" class="sr-only peer" checked
@@ -856,7 +856,7 @@
 
                         <div>
                             <span class="text-xs font-mono font-black block text-stone-800">WARMUP_MOCK_BOT</span>
-                            <span class="text-[9px] text-stone-500 font-semibold">若連續 10 秒無人發言，自動送上詞庫暖場</span>
+                            <span class="text-[9px] text-stone-500 font-semibold">若連續 30 秒無人發言，自動送上詞庫暖場</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="sb-mock-switch" class="sr-only peer" checked
@@ -1016,7 +1016,7 @@
         // ==========================================
         // 照片清單與模糊背景
         // ==========================================
-        const TOTAL_PHOTOS = 232; // 💡 總共有 232 張照片，自動輪播 001.webp ~ 232.webp
+        const TOTAL_PHOTOS = 247; // 💡 總共有 247 張照片，自動輪播 001.webp ~ 247.webp
         const PHOTO_PREFIX = "img/"; // 照片放在 img 資料夾
 
         const PRESET_PHOTOS = Array.from({ length: TOTAL_PHOTOS }, (_, i) => {
@@ -1065,11 +1065,11 @@
 
         // 智能發送隨機計時器與暖場設定
         let mockBotTimer = null;
-        const MOCK_IDLE_DELAY_MS = 10000; // 💡 若連續 10 秒無人發言，再自動發送
+        const MOCK_IDLE_DELAY_MS = 30000; // 💡 若連續 30 秒無人發言，再自動發送
         let lastMockIndex = -1;
 
         // 賓客發送冷卻限制
-        const GUEST_SEND_COOLDOWN_MS = 2000; // 💡 賓客發送彈幕後 2 秒才可再次發送
+        const GUEST_SEND_COOLDOWN_MS = 5000; // 💡 賓客發送彈幕後 5 秒才可再次發送
         let lastGuestSendTimestamp = 0;
         let lastSandboxSendTimestamp = 0;
         let cooldownTimer = null;
@@ -1525,7 +1525,7 @@
                 }
                 updateAdminAndSandboxTable();
 
-                // 💡 真人賓客發言，重設 10 秒無人發言計時器
+                // 💡 真人賓客發言，重設 30 秒無人發言計時器
                 resetMockBotTimer();
             } else {
                 totalMockSentCount++;
@@ -1653,7 +1653,7 @@
                 return;
             }
 
-            // 記錄本次發送時間，啟動 2 秒冷卻鎖定
+            // 記錄本次發送時間，啟動 5 秒冷卻鎖定
             lastGuestSendTimestamp = Date.now();
 
             // 分發彈幕
@@ -1663,18 +1663,18 @@
             const charCount = document.getElementById('char-count');
             if (charCount) charCount.innerText = "0/40";
 
-            // 發送按鈕動畫回饋與 2 秒冷卻倒數
+            // 發送按鈕動畫回饋與 5 秒冷卻倒數
             const originalBtnHTML = `<i class="fa-solid fa-paper-plane"></i> 一鍵送出現場祝福`;
             if (sendBtn) {
                 sendBtn.disabled = true;
                 sendBtn.classList.add('opacity-70', 'cursor-not-allowed');
                 sendBtn.classList.remove('active:scale-95');
-                sendBtn.innerHTML = `<i class="fa-solid fa-clock"></i> 已送出！稍候 (2s)...`;
+                sendBtn.innerHTML = `<i class="fa-solid fa-clock"></i> 已送出！稍候 (5s)...`;
             }
             if (successTip) successTip.classList.remove('hidden');
 
             if (cooldownTimer) clearInterval(cooldownTimer);
-            let remainingSeconds = 2;
+            let remainingSeconds = 5;
             cooldownTimer = setInterval(() => {
                 remainingSeconds--;
                 if (remainingSeconds > 0) {
@@ -1842,7 +1842,7 @@
             activeDanmakusList = [];
             tracks = Array(NUM_TRACKS).fill(null);
             danmakuQueue = [];
-            resetMockBotTimer(); // 清空後重新倒數 10 秒
+            resetMockBotTimer(); // 清空後重新倒數 30 秒
         }
 
         // ==========================================
@@ -2024,7 +2024,7 @@
 
             if (!isMockBotEnabled) return;
 
-            // 💡 若連續 10 秒無人發言，再自動發送 MOCK_PRESET_MESSAGES
+            // 💡 若連續 30 秒無人發言，再自動發送 MOCK_PRESET_MESSAGES
             mockBotTimer = setTimeout(() => {
                 triggerMockMessage();
                 resetMockBotTimer();
